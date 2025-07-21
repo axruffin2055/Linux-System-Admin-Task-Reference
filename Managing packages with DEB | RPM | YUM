@@ -1,0 +1,46 @@
+DEB packaging managment             
+$ sudo apt-get update                     Get the latest package versions
+$ sudo apt-search nameOfPackage           Find package by key word (nameOfPackage                 
+$ sudo apt-cache show nameOfPackage       Display information about a package               
+$ sudo apt-get install nameOfPackage      Install nameOfPackage               
+$ sudo apt-get upgrade                    Update installed packages             
+$ sudo apt-cache pkgnames                 List all packages that are installed   
+
+Managing RPM Packages with YUM
+Yellowdog Updater Modified: YUM helped solve the managment dependencies with RPM packages:/etc/yum.conf
+Software repositories can be enabled by dropping files ending in .repo into the directory: /etc/yum.repos.d/
+# yum list available or installed or all
+# yum search editor
+# yum info packageName
+# yum provides packageName
+# yum deplist packageName | less  : If no package is available to provide a dependency we can search other repositories for components need by using deplist
+# yum install packageName
+# yum reinstall packageName
+# rpm -i --replacepkgs packageName-<VERSION>.rpm  (Restore the package to its original state)
+# rpm -V packageName           (Then verify)
+# yum erase packageName
+# yum history     : An alternative method to remove a set of packages that are installed
+# yum check-update  or update
+# yum grouplist | less  or groupinfo packageName
+# yum groupinstall packageGroup     or   groupremove packageGroup
+
+Maintaining your RPM package database and cache
+# yum clean packages    or   clean metadata     or   clean all
+# yum check     then    # yum clean packageName   (Package that is causing errors, we can rebuild the database)
+
+Querying rpm information
+Using the
+
+# rpm -q --requires emacs-common          -q option: see information about the package.
+# rpm -q --provides emacs-common
+# rpm -q --scripts httpd
+
+# rpm -qi packageName        -qi: include descriptions.
+# rpm -ql packageName        -ql: list files
+# rpm -qd packageName        -qd: show documentation
+# rpm -qc packageName        -qc: show configuration files.
+
+
+
+
+
