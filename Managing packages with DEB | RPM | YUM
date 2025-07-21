@@ -29,8 +29,6 @@ Maintaining your RPM package database and cache
 # yum check     then    # yum clean packageName   (Package that is causing errors, we can rebuild the database)
 
 Querying rpm information
-Using the
-
 # rpm -q --requires emacs-common          -q option: see information about the package.
 # rpm -q --provides emacs-common
 # rpm -q --scripts httpd
