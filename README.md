@@ -1,8 +1,8 @@
-# Linux-System-Admin-
-DEB packaging managment             
-$ sudo apt-get update                                                          |**Get the latest package versions
-$ sudo apt-search nameOfPackage-Find package by key word (nameOfPackage                 
-$ sudo apt-cache show nameOfPackage       ::-Display information about a package               
-$ sudo apt-get install nameOfPackage      ::-Install nameOfPackage               
-$ sudo apt-get upgrade                    ::-Update installed packages             
-$ sudo apt-cache pkgnames                 ::-List all packages that are installed                
+Quote for the mind:  
+The more sand that has escaped from the hourglass of our life, the clearer we should see through it.  
+Jean Paul
+
+# Linux-System-Admin
+
+Use this page as a reference because, as Linux System Administrators, we cannot remember everything.
+However, we can remember that we have tools that we can use to solve problems.
