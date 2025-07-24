@@ -47,8 +47,10 @@ View units that a target unit will activate.
 View units a target unit must activate or requires because that unit will fail.
 # systemctl show --property "Requires" multi-user.target
 
-See all the services that are being offered by a Linux server using systemd
+See all the services that are being offered by a Linux server using systemd:
 # systemctl list-unit-files --type=service | grep -v disabled
+
+Control unit using systemd subcommands using systemctl:
 # systemctl status cups.service
 # systemctl stop cups.service
 # systemctl start cups.service     : Use this when you need service right now, but will not persist after reboot.
@@ -56,10 +58,10 @@ See all the services that are being offered by a Linux server using systemd
 # systemctl condrestart cups.service     : Conditional restart only restarts a service if it is currently running.
 # systemctl reload sshd.service    : Doing a reload on a service, instead of a restart, prevents any pending service operations from being aborted.
 # systemctl enable cups.service    : This service will now persist after reboot. 
-
+# systemctl disable cups.service
 
 # systemctl status cups.service  (Using SysVinit services)
 # service cups start or stop or restart or status or reload (Use to restart to service and the service will not shut down)
-# systemctl disable cups.service
+
 
 
