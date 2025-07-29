@@ -13,22 +13,23 @@ There are eight systemd unit types:
 ■ socket
 ■ target:     A target unit is simply a group of other units.
 
-# systemctl list-units | grep .service   or     | grep .target
-# systemctl list-unit-files --type=service     or    --type=target
+Search for a unit type:
+# systemctl list-units | grep *.service   or     | grep *.target
 
+List all unit of type
+# systemctl list-unit-files --type=service --all     or    --type=target   --all
+# systemctl list-unit-files --type=service --all | grep sshd
 # cat /lib/systemd/system/sshd.service    (check out a config file *.service)
 Description: A free-form description of the service.
-
 After: lists units that should be activated before this service is started.
-
 Environment File: The service’s configuration file.
-
 ExecStart: The command used to start this service.
-
 ExecReload: The command used to reload this service.
-
 WantedBy: The target unit this service belongs to.
 
+Look at units:
+#ls /usr/lib/systemd/system/*.target  or  *.<unit>
+Then view the *.target  or *.<unit>
 # cat /lib/systemd/system/multi-user.target   (This config has added parameters)
 Requires: If this multi-user.target gets activated, the listed target unit is
 also activated. If the listed target unit is deactivated or fails, then multi-user.
@@ -37,7 +38,6 @@ target and listed target unit activate simultaneously.
 
 AllowIsolate: If set to yes, then this target unit, multi-user.target,
 is activated along with its dependencies and all others are deactivated.
-
 Conflicts: This setting avoids conflicts in services. Starting multi-user.
 target stops the listed targets and services, and vice-versa.
 
@@ -50,7 +50,45 @@ View units a target unit must activate or requires because that unit will fail.
 See all the services that are being offered by a Linux server using systemd:
 # systemctl list-unit-files --type=service | grep -v disabled
 
-Control unit using systemd subcommands using systemctl:
+List dependencies on a service:
+# systemctl list-dependencies ssh.service
+
+systemd do runlevels are call target; therefore, we can see systemd's  *.target names to each runlevel:
+# ls -ld /usr/lib/systemd/system/runlevel*
+
+
+
+More info on SysVinit systems runlevel:
+| Runlevel | Name                | Description                                                           |
+| -------- | ------------------- | --------------------------------------------------------------------- |
+| `0`      | Halt                | Shuts down the system safely.                                         |
+| `1`      | Single-user mode    | Maintenance mode: no networking, only root shell. Ideal for recovery. |
+| `2`      | Multi-user (no NFS) | Like 3 but without remote (network) filesystems. Often not used.      |
+| `3`      | Multi-user          | Full multi-user text mode (no GUI). Used for headless servers.        |
+| `4`      | Undefined           | User-definable. Rarely used.                                          |
+| `5`      | Graphical           | Multi-user with GUI (X11/Wayland). Default for desktops.              |
+| `6`      | Reboot              | Restarts the system.                                                  |
+
+
+Info on how systemd uses SysVinit systems runlevel:
+| Situation                       | What to Use                         |
+| ------------------------------- | ----------------------------------- |
+| Boot into text mode only        | Runlevel 3 / `multi-user.target`    |
+| Need maintenance as root        | Runlevel 1 / `rescue.target`        |
+| Want full desktop login         | Runlevel 5 / `graphical.target`     |
+| Clean reboot                    | Runlevel 6 / `reboot.target`        |
+| Emergency shell with minimal fs | `emergency.target`                  |
+| Custom server mode              | Define your own Runlevel 4 / target |
+
+How to use systemd runlevel *.target:  (These commands take affect after reboot)
+# systemctl get-default                                       Check current target
+# systemctl set-default graphical.target                      Change default target
+# systemctl isolate rescue.target                             Boot into rescue mode  
+# systemctl isolate emergency.target                          Boot into emergency mode
+
+
+
+Control and manage units using systemd subcommands with systemctl: (Remember that systemd can be used as a replacement for cron to run schedule for jobs)
 # systemctl status cups.service
 # systemctl stop cups.service
 # systemctl start cups.service     : Use this when you need service right now, but will not persist after reboot.
@@ -60,6 +98,11 @@ Control unit using systemd subcommands using systemctl:
 # systemctl enable cups.service    : This service will now persist after reboot. 
 # systemctl disable cups.service
 
+Use systemd way of taking logging information using journalctl:
+journalctl                     List all journal listings 
+journalctl -n 5                show the last 5 log entries
+journalctl -f                  Show live updated entries
+journalctl  -b                 Show current boot sessions
 # systemctl status cups.service  (Using SysVinit services)
 # service cups start or stop or restart or status or reload (Use to restart to service and the service will not shut down)
 
