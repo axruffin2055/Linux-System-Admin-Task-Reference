@@ -18,9 +18,9 @@ Use the description below as a reference to understand how to read : ps aux :
 - COMMAND: Shows the actual command that spawned that running process.
 
 It maybe better to use: ps aux : and pipe it with: grep : so we can filter a specific process:
-ps aux  | grep syslog          For daemon services info    
-ps aux  | grep sshd            For network service info
-ps aux  | grep crond           For schedule recurring jobs info
+ps aux  | grep syslog          (For daemon services info)    
+ps aux  | grep sshd            (For network service info)
+ps aux  | grep crond           (For schedule recurring jobs info)
 
 To monitor processes:
 Use the: top : command to shows real-time process information such as CPU, Memory and 
@@ -30,7 +30,7 @@ While using : top : command we can sort, filter, or even kill processes:
 - h	: Help or show command list
 - P	: Sort by CPU usage
 - M	: Sort by memory usage
-- T	: Sort by time+ (cumulative CPU time)
+- T	: Sort by time (cumulative CPU time)
 - k	: Kill a process (you’ll be prompted for PID)
 - r	: Renice (change process priority)
 - u	: Filter by user
@@ -57,13 +57,20 @@ kill <PID>
 OR
 pkill gedit          (Takes the name of the process and kill that process)
 
-We can manage process priority by changing the nice value. Most favorable : -20  and less favorable : 19, which mean we can
-set nice value from -20 to 19.
-ps aux  | grep keep_running_script             Get the PID
-renice 5 <PID>                               Default for most process is 10; therefore nice value 5 is a better value.
-nice --5 ./keep_running_script.sh&           start a process in the background and change the nice value.
-
 Also, there are different ways that the : kill : command can be used giving 
 the : kill : command's signal. I have a reference table below:
 https://github.com/axruffin2055/Linux-System-Admin-Task-Reference/blob/main/kill%20command%20kill%20signal's%20List
+
+
+We can manage process priority by changing the nice value. 
+Most favorable : -20  and less favorable : 19, 
+which mean we can set nice value from -20 to 19.
+ps aux  | grep keep_running_script           (Get the PID)
+renice 5 <PID>                               (Default for most process is 10; 
+                                              therefore nice value 5 is a better value.)
+
+OR
+
+Start a process in the background and change the nice value.
+nice --5 ./keep_running_script.sh&           
 
