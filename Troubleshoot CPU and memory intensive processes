@@ -1,0 +1,41 @@
+When we have a process that is consuming too much CPU time or too much memory,
+this can result in the system slowing down or becoming unstable. 
+
+Let us top to identify or pinpoint which process or processes are causing the problem:
+top                     Use sort to troubleshoot CPU, mem, etc.
+
+While using: top : command, we can sort, filter, or even kill processes:
+- q	: Quit top
+- h	: Help or show command list
+- P	: Sort by CPU usage
+- M	: Sort by memory usage
+- T	: Sort by time+ (cumulative CPU time)
+- k	: Kill a process (you’ll be prompted for PID)
+- r	: Renice (change process priority)
+- u	: Filter by user
+- 1	: Toggle per-CPU/core usage view
+- z	: Toggle color highlight
+- Shift + > / <: Scroll right/left through columns
+
+After top we can check on unit using systemd:
+systemctl or service sshd status
+
+View all processes that are spawned by the system, but not a user:
+ps aux   | grep <package or service name>           
+                                                     
+We used: top : command to connect resources usages giving each process. 
+We used: ps aux | grep ... : to list services or package info.
+With both of those command we can get the PID and use the PID kill processes 
+that are using too much memory or too much CPU time:
+kill <PID>               This default kill is a graceful shutdown
+Kill -l                  List the kill signals
+kill -9 <PID>            Force shutdown ungracefully  (Meaning nothing will save or be logged)
+
+I have a kill command signal list with decription on when to use them below:
+https://github.com/axruffin2055/Linux-System-Admin-Task-Reference/blob/main/kill%20command%20kill%20signal's%20List
+
+If forcing a process shutdown does not re-allocate the memory or CPU cycles, then we might 
+have to restart the system. But first, while it comes to the service that is causing the 
+problem, be sure to check that service and make sure it does not start up on reboot.
+# systemctl list-unit-files --type service  | grep enabled           List all services that are enabled
+# systemctl disable sshd.service                                     This will disable the service that use to startup at boot
