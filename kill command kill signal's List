@@ -1,0 +1,26 @@
+A quick kill sig reference table.
+
+----------------------------------------------------------------------------------------------------------------
+| Signal    | Name   | Number | Meaning / Use Case                                                                 |
+| --------- | ------ | ------ | ---------------------------------------------------------------------------------- |
+| `SIGTERM` | `TERM` | 15     | **Graceful shutdown**. Default. Allows cleanup. Use first when stopping a process. |
+| `SIGKILL` | `KILL` | 9      | **Force kill**. Immediate termination. Cannot be caught or ignored. Last resort.   |
+| `SIGINT`  | `INT`  | 2      | Interrupt from keyboard (Ctrl+C). Used for foreground apps.                        |
+| `SIGHUP`  | `HUP`  | 1      | "Hang up". Often used to reload config files in daemons.                           |
+| `SIGQUIT` | `QUIT` | 3      | Quit and dump core. Useful for debugging.                                          |
+| `SIGSTOP` | `STOP` | 19     | Pause a process (like `Ctrl+Z`). Cannot be caught.                                 |
+| `SIGCONT` | `CONT` | 18     | Resume a stopped process.                                                          |
+| `SIGUSR1` | `USR1` | 10     | User-defined (custom signal).                                                      |
+| `SIGUSR2` | `USR2` | 12     | Another user-defined signal.                                                       |
+| `SIGALRM` | `ALRM` | 14     | Used for timer expiration. Common in scripting.                                    |
+| `SIGCHLD` | `CHLD` | 17     | Sent when a child process exits. Used by parents to reap zombies.                  |
+| `SIGPIPE` | `PIPE` | 13     | Sent when writing to a broken pipe. Usually causes termination.                    |
+| `SIGTSTP` | `TSTP` | 20     | Pause from terminal (Ctrl+Z). Can be caught or ignored.                            |
+| `SIGABRT` | `ABRT` | 6      | Abort. Often triggered by failed assertions. Dumps core.                           |
+| `SIGFPE`  | `FPE`  | 8      | Floating-point exception (division by zero, etc).                                  |
+| `SIGILL`  | `ILL`  | 4      | Illegal instruction. Signals corruption or exploit attempt.                        |
+| `SIGSEGV` | `SEGV` | 11     | Segmentation fault. Access violation (bad pointer). Dumps core.                    |
+| `SIGTRAP` | `TRAP` | 5      | Used by debuggers to trap signals.                                                 |
+| `SIGXCPU` | `XCPU` | 24     | CPU time limit exceeded (if enforced).                                             |
+| `SIGXFSZ` | `XFSZ` | 25     | File size limit exceeded.                                                          |
+
