@@ -1,0 +1,57 @@
+Troubleshoot file permission issues. 
+
+Let say we are log in as Michelle Williams and not root.
+We can see that the owner is root with read and write permissions. We can see the
+group is root with read permission, and we can see everyone else has read permission.
+Other or everyone else that has only read permission to this file includes Michelle.
+And, yet, Michelle can still delete files from sharedFile directory:
+ls -l /shareFiles
+output:
+-rw-r--r--  1 root root 0 Jul 28  16:01   File1              
+-rw-r--r--  1 root root 0 Jul 28  16:01   File2            
+-rw-r--r--  1 root root 0 Jul 28  16:01   File3              
+
+This is because if we check the shareFiles directory, we can see that everybody 
+(The owner, group, and other) has read, write, and execute on this directory:
+sudo ls -ld /shareFiles/
+Output:
+drwxrwxrwx 2 root root 3 Jul 28  16:01  /shareFiles/   
+
+To solve this problem we can set the sticky bit on this subdirectory, which means 
+that only the owner of a file and root can delete files in that location: 
+chmod o+t /sharedfiles/   
+OR                           The +t or the 1 means I'm turning on the sticky bit.
+chmod 1777 /sharedfiles/ 
+
+Now we can see the sticky bit turned on. Also, we can only set sticky bit on subdirectories:              
+sudo ls -ld /shareFiles/ 
+Output:
+drwxrwxrwxt 2 root root 3 Jul 28  16:01  /shareFiles/                      
+
+Now lets say the permission on /WebFolder directory is:
+sudo ls -ld /WebFolder
+drwxr-xr-- 2 root root 3 Jul 28  16:01  /webFolder/              
+
+If Michelle tries to cd or enter into /WebFolder/, she will get an permission denied.                                                    
+We can see, as root, that the problem is that there is no execute permission set for others.   
+
+In order for Michelle to be able to change into a directory,
+she has to have read and execute permission on that directory:
+sudo chmod +x /webFolder/     
+OR
+sudo chmod 755 /webFolder/
+sudo ls -ld /webFolder
+drwxr-xr-x 2 root root 3 Jul 28  16:01  /webFolder/              
+Now Michelle can enter the directory
+
+
+In order for Michelle to execute or run a script, she need to have read and execute permission on that file.
+As we can see, Owner, group, and others do not have execute permission on this file
+sudo ls -l /scriptFolder/ 
+Output:
+-rw-r--r--  1 root root 0 Jul 28  16:01   script1.sh         
+sudo chmod +x script1.sh
+sudo ls -l /scriptFolder/ 
+Output:
+-rwxr-xr-x  1 root root 0 Jul 28  16:01   script1.sh  
+
