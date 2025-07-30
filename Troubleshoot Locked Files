@@ -1,0 +1,38 @@
+Troubleshoot locked files:
+
+Some times, backup software can skip processes on files that are has currently in use and locked.
+In other cases, we might have a requirement for another process  or a user may need to get exclusive 
+access to a file that is already locked by another user or process. How do we combat this?
+By gaining information on that file and by gaining information on the process on that file.
+In doing so, if the process on the file or the user that is using that file, is not as important
+than the task needed for the file right now, then we can use the: kill : command on the process on that file.
+
+Gain info on open files.
+This list all open files:
+lsof  | less 
+Or check directories recursively to look for file by name:
+lsof +D /path/to/search -R | grep <file_name>.*     
+
+OR
+
+List the files that user michelle has opened:
+lsof -u mwlliams           
+
+Because of the lsof command, we can use the PID to kill processes gracefully 
+kill <PID>                        This will kill the process gracefully
+
+Here is another example where we want to kill the process on a port that is in use.
+Because port 22 is in use, that means port 22 is locked.
+
+This will get us the PID to kill the process:
+fuser -vn tcp 22    
+Then kill the process:
+kill <PID>   
+
+Please be sure to first use the : man : command and read the manual to all commands 
+you do not understand before using the command:
+man fuser
+
+Also, there are different ways that the : kill : command can be used giving 
+the : kill : command's signal. I have a reference table below:
+https://github.com/axruffin2055/Linux-System-Admin-Task-Reference/blob/main/kill%20command%20kill%20signal's%20List
