@@ -1,0 +1,69 @@
+Processes, Daemons, and Services:
+
+Show an hierarchy of the system processes:
+pstree |less               
+
+List and shows all processes running on the system:
+ps aux          
+Use the description below as a reference to understand how to read : ps aux :
+- USER: List of usernames that started the process.
+- PID: The process ID
+- %CPU: The percentage of the CPU's processing power that a process is currently using.
+- %MEM: The percentage of physical RAM (memory) the process is using.
+- VSZ (Virtual Memory Size): Total amount of virtual memory the process has access to.
+- RSS (Resident Set Size): The portion of the process's memory that is currently in RAM
+- TTY: Mean which terminal device is associated with that process or where was the running processor 
+       had started from. This "?", means that the process was started by a background daemon or service.
+- STAT: Current status of the process
+- COMMAND: Shows the actual command that spawned that running process.
+
+It maybe better to use: ps aux : and pipe it with: grep : so we can filter a specific process:
+ps aux  | grep syslog          For daemon services info    
+ps aux  | grep sshd            For network service info
+ps aux  | grep crond           For schedule recurring jobs info
+
+To monitor processes:
+Use the: top : command to shows real-time process information such as CPU, Memory and 
+Running usage processes, Load average, and Uptime.
+While using : top : command we can sort, filter, or even kill processes:
+- q	: Quit top
+- h	: Help or show command list
+- P	: Sort by CPU usage
+- M	: Sort by memory usage
+- T	: Sort by time+ (cumulative CPU time)
+- k	: Kill a process (you’ll be prompted for PID)
+- r	: Renice (change process priority)
+- u	: Filter by user
+- 1	: Toggle per-CPU/core usage view
+- z	: Toggle color highlight
+- Shift + > / <: Scroll right/left through columns
+
+We can install better version of top
+sudo zypper install htop       (A more advance interactive UI of top)
+sudo zypper install atop       (Has historical data logs and live view)
+
+We can use Batch mode to store top output information and write that information to a file:
+top -n 5 -b > /top_info.txt                   (Redirect five iterations of top info to a file)
+
+Stop and start a process.
+This will start a process in the background:
+gedit &        
+ps aux  | grep gedit       (Get the process PID)
+List kill options:
+kill -l        (If needed)     
+kill -15 <PID>   
+OR
+kill <PID> 
+OR
+pkill gedit          (Takes the name of the process and kill that process)
+
+We can manage process priority by changing the nice value. Most favorable : -20  and less favorable : 19, which mean we can
+set nice value from -20 to 19.
+ps aux  | grep keep_running_script             Get the PID
+renice 5 <PID>                               Default for most process is 10; therefore nice value 5 is a better value.
+nice --5 ./keep_running_script.sh&           start a process in the background and change the nice value.
+
+Also, there are different ways that the : kill : command can be used giving 
+the : kill : command's signal. I have a reference table below:
+https://github.com/axruffin2055/Linux-System-Admin-Task-Reference/blob/main/kill%20command%20kill%20signal's%20List
+
