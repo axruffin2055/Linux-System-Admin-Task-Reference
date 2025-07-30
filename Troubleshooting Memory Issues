@@ -1,0 +1,32 @@
+
+Troubleshooting Memory Issues:
+
+The amount of memory or RAM in your Linux system determines how many processes can run concurrently. When we run out of memory, 
+the oldest used memory pages are swapped out to disk to a swap file. The swap partition makes space for the new memory that is required.
+However, the problem with disk access, when it come to us needing access to direct memory, disk is many thousands of times slower 
+to access memory directly than RAM. Thankfully, We have a number of commands that we can use in Linux to see how much memory we have
+and also we can see how that memory is being used.
+
+Here we can check the memory file then see some memory statistics:
+cat /pro/meminfo | more              
+ 
+We can check how much memory we have in total, how much is used, and how much is free, which applies to physical memory, 
+electronic memory, RAM, swap partition, and swap memory through a swap file:
+free  -g                                                                
+
+Poorly managed processes can also cause memory issue. We can use top command to view all processes.
+While using: top : press the letter F, which will take us into the fields screen. Scroll down and highlight %MEM.
+Then press the letter S to set it as the sort column:
+top                            
+
+We should also take into account when we bootup the system, what services are set to start at boot time. Why? Because the more 
+processes we have set to start on boot up, the more memory will be consumed. 
+Let check enabled unit and see if we need them all at boot time:
+systemctl list-unit-files | more | grep enable                                                                         
+
+Finally, sometimes we have a problem with physical memory chips themselves. 
+Let do a memory diagnostic test. First, we need to download our Linux OS ISO file and drag and drop that file
+into an installer USB. Next while USB installer with ISO Linux files is plugged in, rebooted the Linux system 
+Boot into USB installer and scroll down to highlight the Troubleshooting boot menu option.
+And from there, run a memory test. The memory diagnostic test will check the RAM for errors or defects.
+
