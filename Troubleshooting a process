@@ -1,0 +1,30 @@
+Troubleshooting a process.
+
+Check corresponding subdirectory created under that process directory by using the PID.
+ls /proc                 (Will show PID list and other directories)
+ls /pro/<PID>            (Gain info on where the process is stored)
+cat /pro/cpuinfo         (Get info host processor info)
+
+Some time process problems can happen because of low disk space:
+df -h        (Check to disk space)
+
+
+When there are troublesome process that is consuming a lot of memory, we can watch memory usage.
+The : watch : command will watch or will check memory every 5 sec using the : df -h : command with option -h:
+watch -n 5 df -h                         
+
+We can also follow the log and updates in real-time:
+tail -f /var/log/message   
+
+And as a final bonus... Because this command has saved my life while dealing with live monitoring 
+hardware events, disk activity, driver issues, USB insertions, and the list goes on:
+sudo dmesg --follow       (Continuously prints kernel messages in real time)
+
+Why use: dmesg : command:
+- When plugging in USB devices, dmesg will verify device recognition by kernel messages.
+- When mounting or unmounting drives, kernel messages will watch for filesystem or errors.
+- dmesg kernel messages will help with hardware or driver debugging.
+- dmesg kernel messages will allow you to watch live as system halts durning reboot or shutdown issues.
+dmesg command is a lifesaver.
+
+Cheers!!!
