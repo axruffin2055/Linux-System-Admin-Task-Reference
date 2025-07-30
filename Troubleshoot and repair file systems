@@ -1,0 +1,68 @@
+Troubleshoot and repair file systems
+
+File systems can become corrupted from a number of reasons such as the system may not have properly shut down, 
+while an application was writing to a file, that file became corrupted or we can already have corruption in the 
+file system and when we try to access the data, we get an error messages. Otherwise, no errors, when accessing 
+data, or mounting file system, should mean the file system is working fine.
+
+Now XFS file systems contains a primary and a secondary superblock. The secondary superblock has metadata 
+about the file system such as the file system type, and the status of the file system. Also xfs file system
+has it own file system commands to help check, fix and repair xfs fils system.
+
+The xfs_repair command can help us check and repair the xfs file system.
+Here, we are using : xfs_repair : command, to analyze volume block with xfs file system type,
+which shows there is an error because xfs_repair wants to make changes to /dev/sdb1 file system.
+This checks the filesystem without make changes:
+xfs_repair -n /dev/sdb1               
+Output:
+...
+would write modified primary superblock                   
+
+Now lets repair the xfs filesystem:
+xfs_repair -v /dev/sdb1                     (This will recreate the filesystem)
+sudo mount /dev/sdb1 /mnt/openSUSE          (Now we should not get errors)
+sudo umount  /mnt/openSUSE                  (When done, un-mount the filesystem)
+
+We can use : xfs_metadump : command for debugging Corruption, which will preserve the exact structure 
+of the filesystem at the time of failure. Also, We can use xfs_metadump for disaster recovery planning 
+because xfs_metadump allow us to recreate a partition structure and map, which can help us diagnose 
+why something was lost.
+
+When we use : xfs_metadump : command that command will create an stored file system data image.
+That image : dumpfile_xfs.img : will contain:
+Superblock info
+Inode information     (Including file names, permissions, timestamps)
+Directory tree structure
+Free space maps and allocation groups
+B-tree structures   (Used by XFS for organizing data)
+
+Create metadata dump: 
+sudo xfs_metadump -o /dev/sdb1 dumpfile_xfs.img           (Create the metadata xfs dump file)
+xfs_mdrestore dumpfile_xfs.img /tmp/xfs_image.img         (Restore the dump file for testing)
+
+As for, how to troubleshoot and repair other filesystems that has filesystem types other than xfs?
+Use the fsck command:
+fsck -n /dev/sdb1        (This get info on device)
+fsck -y /dev/sdb1        (This gives permission to fsck to go ahead and repair everything)
+fsck -y /dev/sdb1        (Double check the repair)
+
+Please be sure to first use the : man : command and read the manual to all commands 
+you do not understand before using the command:
+man btrfs
+
+Also, use this table to look for tool verse the file system type.
+Example: File system type: Btrfs, will use tools such as: btrfs check, btrfs scrub, btrfs restore.
+-----------------------------------------------------------------------------------------------------------------------------------
+| Filesystem                        | Tool(s)                                           | Description                              |
+| --------------------------------- | ------------------------------------------------- | ---------------------------------------- |
+| **ext2/ext3/ext4**                | `e2fsck`, `tune2fs`, `debugfs`, `resize2fs`       | Most common Linux filesystems            |
+| **Btrfs**                         | `btrfs check`, `btrfs scrub`, `btrfs restore`     | Modern CoW filesystem; native tools only |
+| **FAT16/32**, **exFAT**, **VFAT** | `dosfsck`, `fsck.vfat`, `fsck.fat`, `fsck.exfat`  | Used on USB drives, SD cards             |
+| **NTFS**                          | `ntfsfix` (Linux), `chkdsk` (Windows)             | Limited repair in Linux, full in Windows |
+| **ReiserFS**                      | `reiserfsck`, `debugreiserfs`                     | Older journaling FS, now deprecated      |
+| **ZFS**                           | `zpool scrub`, `zpool status`, `zdb`, `zfs mount` | Advanced enterprise-level FS             |
+| **ISO9660**                       | `isoinfo`, `isovfy`                               | Read-only CD/DVD images                  |
+| **UFS** (BSD)                     | `fsck_ufs`, `fsdb`                                | UNIX File System, used in BSD            |
+| **HFS+**, **APFS**                | macOS tools only (`fsck_hfs`, `diskutil`)         | Limited support on Linux via 3rd party   |
+| **F2FS** (Flash-Friendly FS)      | `fsck.f2fs`, `dump.f2fs`, `f2fs-tools`            | Designed for SSDs, phones, flash         |
+
