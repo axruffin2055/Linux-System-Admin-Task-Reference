@@ -4,14 +4,14 @@ Linux system unit configuration files location:
 
 
 There are eight systemd unit types:
-■ automount
-■ device
-■ mount
-■ path
-■ service:    A service unit is for managing daemons on your Linux server.
-■ snapshot
-■ socket
-■ target:     A target unit is simply a group of other units.
+- automount
+- device
+- mount
+- path
+- service:    A service unit is for managing daemons on your Linux server.
+- snapshot
+- socket
+- target:     A target unit is simply a group of other units.
 
 Search for a unit type:
 # systemctl list-units | grep *.service   or     | grep *.target
@@ -87,14 +87,15 @@ How to use systemd runlevel *.target:  (These commands take affect after reboot)
 # systemctl isolate emergency.target                          Boot into emergency mode
 
 
-
-Control and manage units using systemd subcommands with systemctl: (Remember that systemd can be used as a replacement for cron to run schedule for jobs)
+Remember that systemd can be used as a replacement for cron to run schedule for jobs.
+Control and manage units using systemd subcommands with systemctl: 
 # systemctl status cups.service
 # systemctl stop cups.service
 # systemctl start cups.service     : Use this when you need service right now, but will not persist after reboot.
 # systemctl restart cups.service
 # systemctl condrestart cups.service     : Conditional restart only restarts a service if it is currently running.
-# systemctl reload sshd.service    : Doing a reload on a service, instead of a restart, prevents any pending service operations from being aborted.
+# systemctl reload sshd.service     : Doing a reload on a service, instead of a restart, prevents any pending service 
+                                      operations from being aborted.
 # systemctl enable cups.service    : This service will now persist after reboot. 
 # systemctl disable cups.service
 
@@ -104,7 +105,9 @@ journalctl -n 5                show the last 5 log entries
 journalctl -f                  Show live updated entries
 journalctl  -b                 Show current boot sessions
 # systemctl status cups.service  (Using SysVinit services)
-# service cups start or stop or restart or status or reload (Use to restart to service and the service will not shut down)
+
+# service cups start         or service cups stop   or restart   or status   or reload (reload is use to restart the service 
+                                                                                        and the service will not shut down the system)
 
 
 
