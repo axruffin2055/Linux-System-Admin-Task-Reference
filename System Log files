@@ -69,19 +69,104 @@ journalctl               (Print all systemd logs)
 system.journal log does not persist, which means logs will not be saved between reboots. 
 If we want to change systemd log file {system.journal} default from being volatile and save logs
 between reboots, we can edit /etc/systemd/journald.conf:
-cat /etc/systemd/journald.conf      (Storage=auto : change it into :Storage=persistent)
+cat /etc/systemd/journald.conf      
+vim /etc/systemd/journald.conf        (Storage=auto : change it into :Storage=persistent)
 
-journalctl -r      (View the log info in reverse order)
-journalctl --disk-usage
-
-
-
-
-
-
-
+journalctl -r                  (View the log info in reverse order)
+journalctl --disk-usage        (Report the system.journal file memory usage)
+journalctl --since "14:00"     (View logs after 2pm)
+journalctl --since yesterday   (If the system has not rebooted or logs persist, 
+                                then we can see logs from yesterday)
+journalctl -b -p err           (View last boot up on the system with errors)
 
 
 
+Newer Linux distributions uses systemd and systemd uses journald for their logging mechanism.
+Verse older Linux systems that syslog daemon journald for logging information:
+cat /etc/systemd/journald.conf
 
+systemd do not have the option of forwarding its logging information to remote host; however, we can use
+the older syslog for remote log forwarding by editing journald.conf:
+nano /etc/systemd/journald.conf
+From:                         Change it into:
+#Storage=auto                 Storage=persistent       (Enable systemd log now will save between reboot)
+#ForwardToSyslog              ForwardToSyslog=yes      (Enable remote forwarding)
+#MaxLevelSyslog=debug         MaxLevelSyslog=warn      (Enable any messages and below warn will get logged to Syslog)
 
+In order to use syslog remote log forwarding, we need to make sure it is active and running: 
+systemctl status rsyslog
+Or                         (We can use systemd or sysVinit to check the status)
+service rsyslog status
+
+If we are going to forward log messages from journald to syslog, 
+we need rsyslog daemon listening on the other end:
+systemctl start rsyslog         (Make it active and running)
+systemctl enable rsyslog        (Make it persist between reboot)
+
+When it come to logs that are archive, stored or rotated (/var/log), we can edit /etc/logrotate.conf
+file or create our own logrotate.conf file and store that file under /ect/logrotate.d
+We can edit this main control log rotation file:
+cat /etc/logrotate.conf
+
+If we create our own rotate.conf file and store that file under /ect/logrotate.d, we can
+use the : logrotate : command to rotate logs:
+logrotate -fv /ect/logrotate.d/my_logrotate
+
+From /var/log we can control where log messages are store by added rules to /etc/rsyslog.conf:
+vim /etc/rsyslog.conf              (Rule created: name_of_rule.*      Store messages:/var/log/name_of_rule.log)
+logger -p name_of_rule.info "Lets check created log rule"
+ls /var/log                        (Will not show name_of_rule.log)
+cat name_of_rule.log               
+Output:
+Lets check created log rule
+
+This list of keywords for /etc/rsyslog.conf will help understand rsyslog.conf selector rule
+format <facility>.<priority> (Facilities: _.* and Priorities: *._ ).
+
+Facility Keywords(_.*):They indicate where the log message originated from:
+- auth     : Authentication and authorization (login, sudo, PAM)
+- authpriv : Private authentication messages (restricted view, secure logs)
+- cron     : Scheduled task logs from cron and at daemons
+- daemon   : System daemon processes (sshd, NetworkManager)
+- kern     : Kernel messages (drivers, hardware — same as dmesg)
+- lpr      : Printer subsystem logs
+- mail     : Mail services (postfix, sendmail)
+- news     : Usenet news system (rarely used today)
+- syslog   : Messages generated internally by rsyslog or syslogd
+- user     : User-level processes (non-kernel, non-daemon)
+- uucp     : Unix-to-Unix Copy protocol (legacy systems)
+- local0   : Reserved for custom local use
+- local1   : Reserved for custom local use
+- local2   : Reserved for custom local use
+- local3   : Reserved for custom local use
+- local4   : Reserved for custom local use
+- local5   : Reserved for custom local use
+- local6   : Reserved for custom local use
+- local7   : Reserved for custom local use
+
+Priority Keywords (*._)
+They indicate the severity level of the log message:
+- emerg   : Emergency — system is unusable
+- alert   : Immediate action required — critical condition
+- crit    : Critical condition — serious failure
+- err     : Error condition — something went wrong (also accepts "error")
+- warning : Warning condition — potential problem
+- notice  : Normal but significant event
+- info    : Informational messages — routine operations
+- debug   : Debug-level messages — detailed for developers/admins
+- none    : No logging — used to exclude facility from output
+
+From /var/log we can control where log messages are store by added rules to /etc/rsyslog.conf:
+vim /etc/rsyslog.conf              
+
+And in /etc/rsyslog.conf we create this rule: (Just like this in the file)
+name_of_rule.*      /var/log/name_of_rule.log
+
+Understand that Facility is : name_of_rule : and Priority can be :debug, notice, erro, warning etc. because
+of this : * : Also, note that because of this rule we have log messages going to both /var/log/messages
+and /var/log/name_of_rule.log. If we wanted /var/log/messages to not receive /var/log/name_of_rule.log
+messages, then:
+vim /etc/rsyslog.conf 
+Then add: (add name_of_rule.none at the place where you see /var/log/messages)  
+name_of_rule.none           /var/log/messages     
+Remember key word none is a priority and we do not want any priority logs going to /var/log/messages.
