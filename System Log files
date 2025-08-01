@@ -11,36 +11,36 @@ because log files that are type binary files require a special type of a command
 binary log file information.
 
 This will show log files and log directories:
-cat /var/log        
-cd /var/log      (Changed into a directory)
-ls               (View content in /var/log)
+# cat /var/log     (This: (#) : means I am root; therefore, no need for sudo) 
+# cd /var/log      (Changed into a directory)
+# ls               (View content in /var/log)
 
 We cannot read binary files like this:
 cat lastlog
 
 If we want to get the last log-in information for a user account from
 the lastlog binary file, we have to use lastlog special command:
-lastlog                      (Now we can read lastlog info)
-lastlog | grep -v Never      (Omit logs that has the prefix Never)
-lastlog -u mwilliam          (Show log-in from that user)
+# lastlog                      (Now we can read lastlog info)
+# lastlog | grep -v Never      (Omit logs that has the prefix Never)
+# lastlog -u mwilliam          (Show log-in from that user)
 
 dmesg is a binary file that takes log information for the Linux kernal.
 This log is great for troubleshooting devices:
-dmesg                       (This is how we view info from dmesg binary file)
-dmesg --level=err           (Show kernal messages with prefix err)
-dmesg --follow              (Show generated logs in Live real-time)
-dmesg | grep -i bluetooth   (Show kernal messages with non-case sensitive prefix bluetooth)
+# dmesg                       (This is how we view info from dmesg binary file)
+# dmesg --level=err           (Show kernal messages with prefix err)
+# dmesg --follow              (Show generated logs in Live real-time)
+# dmesg | grep -i bluetooth   (Show kernal messages with non-case sensitive prefix bluetooth)
 
 We can also gain added info on the binary file special command:
 man dmesg
 
 Remember we are in /var/log directory
-cd /var/log 
-ls
+# cd /var/log 
+# ls
 
 When we read files that are type text, we may want to use : grep : command to filter the log:
-cat messages                   (Will read/print all logs from messages text file)
-cat messages | grep error      (Will only print logs with the prefix error)
+# cat messages                   (Will read/print all logs from messages text file)
+# cat messages | grep error      (Will only print logs with the prefix error)
 
 Hopefully the Linux system is using Network Time Protocol (NTP); therefore, all hosts within that Linux 
 system will have synchronized computer clock across that network. That being said, while looking at any log, 
@@ -53,72 +53,72 @@ PID for that {generated log entry}. Strictly speaking, we can use log files to t
 however, it maybe a good idea to use log files as a preemptive step to look at problems that might be building.
 
 Example:{generated log entry}:NetworkManager, {message ID number}: 1150
-journalctl -u NetworkManager --since "2025-07-31 01:45:00" | Grep "1150"
+# journalctl -u NetworkManager --since "2025-07-31 01:45:00" | Grep "1150"
 
 initd will use the old syslog daemon for logging system information. Verse, the newer Linux distributions 
 that uses systemd and systemd uses journald for their logging mechanism: 
-ls /run/log/journal/bbd1del50...          (A subdirectory under journal directory)
+# ls /run/log/journal/bbd1del50...          (A subdirectory under journal directory)
 Output:
 system.journal                            (This is systemd log type binary file)
 
 Within this subdirectory {bbd1del50...} under journal's directory, we can check systemd journal 
 logging by using {system.journal} log type binary file special command:
-journalctl               (Print all systemd logs)
+# journalctl               (Print all systemd logs)
 
 
 system.journal log does not persist, which means logs will not be saved between reboots. 
 If we want to change systemd log file {system.journal} default from being volatile and save logs
 between reboots, we can edit /etc/systemd/journald.conf:
-cat /etc/systemd/journald.conf      
-vim /etc/systemd/journald.conf        (Storage=auto : change it into :Storage=persistent)
+# cat /etc/systemd/journald.conf      
+# vim /etc/systemd/journald.conf        (Storage=auto : change it into :Storage=persistent)
 
-journalctl -r                  (View the log info in reverse order)
-journalctl --disk-usage        (Report the system.journal file memory usage)
-journalctl --since "14:00"     (View logs after 2pm)
-journalctl --since yesterday   (If the system has not rebooted or logs persist, 
-                                then we can see logs from yesterday)
-journalctl -b -p err           (View last boot up on the system with errors)
+# journalctl -r                  (View the log info in reverse order)
+# journalctl --disk-usage        (Report the system.journal file memory usage)
+# journalctl --since "14:00"     (View logs after 2pm)
+# journalctl --since yesterday   (If the system has not rebooted or logs persist, 
+                                  then we can see logs from yesterday)
+# journalctl -b -p err           (View last boot up on the system with errors)
 
 
 
 Newer Linux distributions uses systemd and systemd uses journald for their logging mechanism.
 Verse older Linux systems that syslog daemon journald for logging information:
-cat /etc/systemd/journald.conf
+# cat /etc/systemd/journald.conf
 
 systemd do not have the option of forwarding its logging information to remote host; however, we can use
 the older syslog for remote log forwarding by editing journald.conf:
-nano /etc/systemd/journald.conf
+# nano /etc/systemd/journald.conf
 From:                         Change it into:
 #Storage=auto                 Storage=persistent       (Enable systemd log now will save between reboot)
 #ForwardToSyslog              ForwardToSyslog=yes      (Enable remote forwarding)
 #MaxLevelSyslog=debug         MaxLevelSyslog=warn      (Enable any messages and below warn will get logged to Syslog)
 
 In order to use syslog remote log forwarding, we need to make sure it is active and running: 
-systemctl status rsyslog
+# systemctl status rsyslog
 Or                         (We can use systemd or sysVinit to check the status)
-service rsyslog status
+# service rsyslog status
 
 If we are going to forward log messages from journald to syslog, 
 we need rsyslog daemon listening on the other end:
-systemctl start rsyslog         (Make it active and running)
-systemctl enable rsyslog        (Make it persist between reboot)
+# systemctl start rsyslog         (Make it active and running)
+# systemctl enable rsyslog        (Make it persist between reboot)
 
 When it come to logs that are archive, stored or rotated (/var/log), we can edit /etc/logrotate.conf
-file or create our own logrotate.conf file and store that file under /ect/logrotate.d
+file or create our own log_rotate.conf file and store that file under /ect/logrotate.d
 We can edit this main control log rotation file:
-cat /etc/logrotate.conf
-
-If we create our own rotate.conf file and store that file under /ect/logrotate.d, we can
-use the : logrotate : command to rotate logs:
-logrotate -fv /ect/logrotate.d/my_logrotate
+# cat /etc/logrotate.conf | less
 
 From /var/log we can control where log messages are store by added rules to /etc/rsyslog.conf:
-vim /etc/rsyslog.conf              (Rule created: name_of_rule.*      Store messages:/var/log/name_of_rule.log)
-logger -p name_of_rule.info "Lets check created log rule"
-ls /var/log                        (Will not show name_of_rule.log)
-cat name_of_rule.log               
+# vim /etc/rsyslog.conf              (Rule created: name_of_rule.*      Store messages:/var/log/name_of_rule.log)
+# logger -p name_of_rule.info "Lets check created log rule"
+# ls /var/log                        (Will not show name_of_rule.log)
+# cat name_of_rule.log               
 Output:
 Lets check created log rule
+
+If we create our own logging rule within the /etc/logrotate.conf file we can
+use the : logrotate : command to rotate logs:
+# logrotate -fv /ect/logrotate.d/name_of_rule.log
 
 This list of keywords for /etc/rsyslog.conf will help understand rsyslog.conf selector rule
 format <facility>.<priority> (Facilities: _.* and Priorities: *._ ).
@@ -161,12 +161,36 @@ vim /etc/rsyslog.conf
 
 And in /etc/rsyslog.conf we create this rule: (Just like this in the file)
 name_of_rule.*      /var/log/name_of_rule.log
-
-Understand that Facility is : name_of_rule : and Priority can be :debug, notice, erro, warning etc. because
-of this : * : Also, note that because of this rule we have log messages going to both /var/log/messages
-and /var/log/name_of_rule.log. If we wanted /var/log/messages to not receive /var/log/name_of_rule.log
-messages, then:
+Understand when it comes to our created rule, name_of_rule.*, that Facility is : name_of_rule : 
+and Priority can be :debug, notice, erro, warning etc. because of this : * : (name_of_rule.*). 
+Also, note that because of this created rule, we have log messages from /var/log/name_of_rule.log going 
+to both /var/log/messages and /var/log/name_of_rule.log. If we wanted /var/log/name_of_rule.log messages 
+to not go tho /var/log/ logs, then:
 vim /etc/rsyslog.conf 
-Then add: (add name_of_rule.none at the place where you see /var/log/messages)  
+Then add: (add name_of_rule.none at the place where you see /var/log/messages like this)  
 name_of_rule.none           /var/log/messages     
 Remember key word none is a priority and we do not want any priority logs going to /var/log/messages.
+
+If we want to create our own rotate.conf file, remember we need to store that file under /etc/logrotate.d
+# ls /etc/logrotate.d
+
+But first note that there is a file that contains the directives for determining how log 
+rotation behaves. And that file is /etc/logrotate.d/syslog: 
+# cat /etc/logrotate.d/syslog
+
+Let create our own rotate.conf file for /var/log/messages. But first we need to comment out
+/var/log/messages within /etc/logrotate.d/syslog:
+# vim /etc/logrotate.d/syslog         (Add (#) in front of /var/log/messages)
+
+Now create a file that controls the log rotation setting for the messages log file:
+# vim /etc/logrotate.d/messages            (keeping the name the same, but you can rename it as you like)
+/var/log/messages          (Verify the path of the logs)
+{
+      rotate 5              (Log files will be rotated 5 times)
+      size 80k              (Log files have to be more than 80k before rotating)
+      create 660 root root  (Create each messages log file with read and write permissions for user and group (root))
+      compress
+      dateext               (Date will be add to the name of the rotated file)
+}
+
+
