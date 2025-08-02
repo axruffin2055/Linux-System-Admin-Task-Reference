@@ -5,7 +5,7 @@ dpkg -i <pkg>.deb               Install a local .deb package.
 dpkg -r <pkg>                   Remove a package (leaves config files).                          
 dpkg -P <pkg>                   Purge a package (removes config files too).                      
 dpkg -l                         List all installed packages.                                     
-dpkg -l <pattern>               List matching installed packages (e.g., dpkg -l '*ssh*').        
+dpkg -l <pattern>               List matching installed packages (dpkg -l '*ssh*').        
 dpkg -s <pkg>                   Show status information about an installed package.              
 dpkg -L <pkg>                   List all files installed by a package.                           
 dpkg -S <file>                  Find which package owns a specific file.                         
@@ -82,7 +82,7 @@ yum check-update                             Check for available package updates
 yum update                                   Install available updates for all packages.                                
 yum grouplist | less                         List all available package groups.                                         
 yum groupinfo <group>                        Show detailed information about a specific group.                          
-yum groupinstall <group>                     Install all packages in a named group (e.g., Development Tools).           
+yum groupinstall <group>                     Install all packages in a named group (Development Tools).           
 yum groupremove <group>                      Remove a previously installed package group.   
 
 
