@@ -4,7 +4,14 @@ Show an hierarchy of the system processes:
 pstree |less               
 
 List and shows all processes running on the system:
-ps aux          
+ps aux  
+Output:
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.0  34260 14508 ?        Ss   16:28   0:02 /usr/lib/systemd/systemd --switched-root --system --deserialize=42
+root         2  0.0  0.0      0     0 ?        S    16:28   0:00 [kthreadd]
+root         3  0.0  0.0      0     0 ?        I<   16:28   0:00 [rcu_gp]
+root         4  0.0  0.0      0     0 ?        I<   16:28   0:00 [rcu_par_gp]
+
 Use the description below as a reference to understand how to read : ps aux :
 - USER: List of usernames that started the process.
 - PID: The process ID
@@ -24,7 +31,8 @@ ps aux  | grep crond           (For schedule recurring jobs info)
 
 To monitor processes:
 Use the: top : command to shows real-time process information such as CPU, Memory and 
-Running usage processes, Load average, and Uptime.
+Running usage processes, Load average, and Uptime:
+
 While using : top : command we can sort, filter, or even kill processes:
 - q	: Quit top
 - h	: Help or show command list
@@ -37,7 +45,7 @@ While using : top : command we can sort, filter, or even kill processes:
 - 1	: Toggle per-CPU/core usage view
 - z	: Toggle color highlight
 - Shift + > / <: Scroll right/left through columns
-
+  
 We can install better version of top
 sudo zypper install htop       (A more advance interactive UI of top)
 sudo zypper install atop       (Has historical data logs and live view)
