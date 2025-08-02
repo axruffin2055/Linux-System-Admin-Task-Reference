@@ -1,0 +1,177 @@
+DEB packaging managment   
+Command                         Description                                                      
+------------------------------- ------------------------------------------------------------------
+dpkg -i <pkg>.deb               Install a local .deb package.                                    
+dpkg -r <pkg>                   Remove a package (leaves config files).                          
+dpkg -P <pkg>                   Purge a package (removes config files too).                      
+dpkg -l                         List all installed packages.                                     
+dpkg -l <pattern>               List matching installed packages (e.g., dpkg -l '*ssh*').        
+dpkg -s <pkg>                   Show status information about an installed package.              
+dpkg -L <pkg>                   List all files installed by a package.                           
+dpkg -S <file>                  Find which package owns a specific file.                         
+dpkg --get-selections           Get a list of selected packages (can be used for backups).       
+dpkg --set-selections           Restore package selections (used with --get-selections).         
+dpkg -c <pkg>.deb               List contents of a .deb file (without installing).               
+dpkg -I <pkg>.deb               Show metadata and headers from a .deb file.                      
+
+Command                     Description                                                  
+--------------------------- ------------------------------------------------------------ 
+sudo apt update             Update package list from repositories (metadata only).       
+sudo apt upgrade            Upgrade all installed packages to latest versions.           
+sudo apt full-upgrade       Upgrade system intelligently (may remove obsolete packages). 
+sudo apt install <pkg>      Install a package by name.                                   
+sudo apt remove <pkg>       Remove a package, but keep config files.                     
+sudo apt purge <pkg>        Remove a package along with its config files.                
+sudo apt autoremove         Remove unused packages installed as dependencies.            
+sudo apt search <keyword>   Search for packages related to keyword.                      
+apt show <pkg>              Show detailed info about a package.                          
+apt list --installed        List all installed packages.                                 
+apt list --upgradable       List all packages that have updates available.               
+dpkg -l                     List installed packages (from lower-level dpkg).             
+dpkg -i <file.deb>          Install a .deb package manually.                              
+dpkg -r <pkg>               Remove a package using dpkg.                                 
+dpkg -P <pkg>               Purge (remove including config) via dpkg.                    
+sudo apt clean              Remove downloaded .deb files from /var/cache/apt/archives.   
+sudo apt autoclean          Remove outdated cached .deb files.                           
+apt-cache search <keyword>      Search for packages matching a keyword (like apt search).        
+apt-cache show <pkg>            Display detailed metadata for a package (description, deps).     
+apt-cache policy <pkg>          Show installed and candidate versions, and repo priorities.      
+apt-cache stats                 Show cache statistics (number of packages, structures, etc).     
+apt-cache depends <pkg>         Show package dependencies.                                       
+apt-cache rdepends <pkg>        Show reverse dependencies (who depends on this pkg).             
+apt-cache dump                 Dump entire metadata cache (mostly used for debugging).           
+apt-cache pkgnames              List all known package names (useful for scripts/tools).         
+
+
+
+RPM packaging managment  
+Command                              Description                                               
+------------------------------------------------------------------------------
+rpm -e <pkg>                         Remove an RPM package.                                            
+
+Querying rpm information
+# rpm -q --requires emacs-common    -q option: see information about the package.
+# rpm -q --provides emacs-common
+# rpm -q --scripts httpd
+# rpm -qi <pkg>                    -qi: include descriptions.
+# rpm -ql <pkg>                    -ql: list files
+# rpm -qd <pkg>                    -qd: show documentation
+# rpm -qc <pkg>                    -qc: show configuration files.
+
+
+
+Managing RPM Packages with YUM
+Yellowdog Updater Modified: YUM helped solve the managment dependencies with RPM packages:/etc/yum.conf
+Software repositories can be enabled by dropping files ending in .repo into the directory: /etc/yum.repos.d/
+Command                                      Description                                                                
+------------------------------------------- ---------------------------------------------------------------------------
+yum list available                           List all available packages from enabled repositories.                     
+yum list installed                           List all currently installed packages.                                     
+yum list all                                 List both installed and available packages.                                
+yum search <keyword>                         Search for packages with a keyword in the name or description.             
+yum info <pkg>                               Show detailed information about a specific package.                        
+yum provides <file>                          Find which package provides a specific file or capability.                
+yum deplist <pkg> | less                     List dependencies for a package and what provides them.                   
+yum install <pkg>                            Install a package from enabled repositories.                               
+yum reinstall <pkg>                          Reinstall a package (refresh to original state).                           
+rpm -i --replacepkgs <pkg>-<ver>.rpm         Reinstall a specific .rpm file, overwriting existing installation.         
+rpm -V <pkg>                                 Verify installed files against package metadata (size, checksum, perms).   
+yum erase <pkg>                              Remove a package and any unused dependencies.                              
+yum history                                  View yum transaction history (installs, upgrades, removals).               
+yum check-update                             Check for available package updates.                                      
+yum update                                   Install available updates for all packages.                                
+yum grouplist | less                         List all available package groups.                                         
+yum groupinfo <group>                        Show detailed information about a specific group.                          
+yum groupinstall <group>                     Install all packages in a named group (e.g., Development Tools).           
+yum groupremove <group>                      Remove a previously installed package group.   
+
+
+
+Maintaining your RPM package database and cache.
+Command                                Description                                                                
+------------------------------------- ---------------------------------------------------------------------------
+yum clean packages                    Remove downloaded .rpm package files from the cache.                       
+yum clean metadata                    Remove repository metadata (forces fresh repo sync on next operation).     
+yum clean all                         Clean all cached data: packages and metadata.                              
+yum check                             Check RPM database for problems like missing dependencies or corrupt data. 
+yum clean <pkg>                       Clean a specific cached package (if causing errors, rebuild cache entry).  
+
+
+
+DNF High-level package manager vs RPM Low-level tool
+Command                                Description                                                                
+------------------------------------- ---------------------------------------------------------------------------
+sudo dnf check-update                  Check for available updates.                              
+sudo dnf update                        Download and install available updates.                   
+sudo dnf upgrade                       Same as update (preferred in newer versions).             
+sudo dnf install <pkg>                 Install a package.                                         
+sudo dnf remove <pkg>                  Remove a package.                                          
+sudo dnf reinstall <pkg>               Reinstall a package.                                       
+sudo dnf search <keyword>              Search for packages matching a keyword.                   
+dnf info <pkg>                         Show detailed info about a package.                       
+dnf list installed                     List all installed packages.                               
+dnf list available                     List all available packages.                               
+sudo dnf group list                    Show available package groups (like "Development Tools"). 
+sudo dnf group install "<group>"       Install a group of related packages.                       
+sudo dnf group remove "<group>"        Remove a group of packages.                                
+sudo dnf clean all                     Clean all cached files.                                    
+sudo dnf autoremove                    Remove packages no longer needed.                         
+sudo dnf history                       View the history of package installs/removals.            
+sudo dnf downgrade <pkg>               Revert to an older version of a package.      
+
+
+
+Zypper packaging managment  
+Command                                Description                                                   
+----------------------------------- ----------------------------------------------------------------
+sudo zypper refresh                    Refresh repository metadata (equivalent to apt update).         
+sudo zypper update                     Update all packages to latest versions.                         
+sudo zypper dup                        Perform distribution upgrade (switch to newer repo versions).   
+sudo zypper install <pkg>              Install a package.                                               
+sudo zypper remove <pkg>               Remove a package.                                                
+sudo zypper search <keyword>           Search for packages by name or description.                      
+zypper info <pkg>                      Show detailed info about a package.                              
+zypper list-updates                    List packages with available updates.                            
+zypper list-patches                    List available patches for the system.                           
+sudo zypper patch                      Apply all available patches.                                     
+zypper repos                           Show configured repositories.                                    
+sudo zypper addrepo <url> <name>       Add a new repository.                                             
+sudo zypper removerepo <name>          Remove a repository.                                              
+zypper packages                        List installed packages from all repositories.                   
+zypper ps                              List processes using deleted files (post-update helper).         
+sudo zypper clean                      Clean up cached data.                                             
+sudo zypper verify                     Check for broken/missing dependencies.                           
+
+
+NMCLI Commands (NetworkManager CLI) BONUS!!!!
+Command                                 Description                                                       
+---------------------------------------------------------------------------------------------------------
+nmcli                                   Show general status of NetworkManager.                            
+nmcli device status                     Show status of all network devices.                               
+nmcli connection show                   List all saved network connections.                               
+nmcli device show <device>              Display detailed info about a specific device.                    
+nmcli connection show <name>            Show details of a specific connection profile.                    
+nmcli connection up <name>              Activate a network connection by name.                            
+nmcli connection down <name>            Deactivate a network connection by name.                          
+nmcli device connect <device>           Connect a specific device.                                        
+nmcli device disconnect <device>        Disconnect a specific device.                                     
+nmcli connection add ...                Add a new connection (manual config, see examples below).         
+nmcli connection delete <name>          Delete a saved network connection.                                
+nmcli radio wifi off                    Turn off Wi-Fi radio.                                             
+nmcli radio wifi on                     Turn on Wi-Fi radio.                                              
+nmcli networking off                    Disable all networking (airplane mode).                           
+nmcli networking on                     Enable all networking.                                            
+nmcli device wifi list                  Scan and list available Wi-Fi networks.                           
+nmcli device wifi connect <SSID>        Connet to a Wi-Fi network (may prompt for password).             
+nmcli connection modify <name> ...      Modify settings of an existing connection.                        
+
+
+
+
+                      
+
+
+
+
+
+
