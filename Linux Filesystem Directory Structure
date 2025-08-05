@@ -1,6 +1,5 @@
 Linux Filesystem Directory Structure
 
-Linux Filesystem Directory Structure
 Directory           : Means            : Description
 
 /bin                : Binary           : Contains essential system binaries (ls, cp, mv) used by all users.
