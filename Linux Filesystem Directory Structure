@@ -1,22 +1,23 @@
 Linux Filesystem Directory Structure
 
-Directory         Description
-------------------------------------------------------------------------------------------------
-/bin              : Contains essential system binaries (ls, cp, mv) used by all users.
-/boot             : Stores boot files, including the kernel and bootloader configurations.
-/dev              : Contains device files representing hardware components.
-/etc              : System configuration files for services and applications.
-/home             : User personal directories and data.
-/lib              : Shared libraries and kernel modules required by system binaries.
-/lost+found       : Used to recover corrupted or lost files after filesystem errors.
-/media            : Mount point for removable media (USB drives, CDs).
-/mnt              : Temporary mount point for mounting filesystems and devices manually.
-/opt              : Stores optional and third-party software packages.
-/proc             : Virtual filesystem providing information about system processes and kernel parameters.
-/root             : Home directory of the root (superuser) account.
-/run              : Stores runtime data for system processes since the last boot.
-/sbin             : Essential system binaries used by the superuser for system administration.
-/srv              : Contains data for services like FTP, web, or databases.
-/tmp              : Temporary files used by applications, cleared on reboot.
-/usr              : User applications, libraries, and documentation.
-/var              : Variable data files such as logs, mail, spool files, and databases.
+Linux Filesystem Directory Structure
+Directory           : Means            : Description
+
+/bin                : Binary           : Contains essential system binaries (ls, cp, mv) used by all users.
+/boot               : -                : Stores boot files, including the kernel and bootloader configurations.
+/dev                : Device           : Contains device files representing hardware components.
+/etc                : Config           : System configuration files for services and applications.
+/home               : User Data        : User personal directories and data.
+/lib                : Libraries        : Shared libraries and kernel modules required by system binaries.
+/lost+found         : Recovery         : Used to recover corrupted or lost files after filesystem errors.
+/media              : Removable Media  : Mount point for removable media (USB drives, CDs).
+/mnt                : Mount            : Temporary mount point for mounting filesystems and devices manually.
+/opt                : Optional         : Stores optional and third-party software packages.
+/proc               : Process Info     : Virtual filesystem providing information about system processes and kernel parameters.
+/root               : Root Home        : Home directory of the root (superuser) account.
+/run                : Runtime          : Stores runtime data for system processes since the last boot.
+/sbin               : Superuser Binary : Essential system binaries used by the superuser for system administration.
+/srv                : Service Data     : Contains data for services like FTP, web, or databases.
+/tmp                : Temporary        : Temporary files used by applications, cleared on reboot.
+/usr                : User Programs    : User applications, libraries, and documentation.
+/var                : Variable Data    : Variable data files such as logs, mail, spool files, and databases.
