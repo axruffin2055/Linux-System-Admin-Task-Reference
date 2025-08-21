@@ -1,0 +1,80 @@
+Concept : Using the GNOME Package Manager
+Description : The GNOME package manager provides a graphical interface to browse, search, install, remove, and manage Linux 
+              software packages. It organizes applications into categories and integrates with software repositories.
+Purpose : To manage software without needing command-line tools, making it easier for desktop users to install and manage applications.
+Linux commands : (GUI based, no direct commands used, but equivalent CLI tools are yum or dnf)
+Additional Info : Software sources (repositories) can be enabled/disabled, and the system can refresh package lists to get 
+                  the latest available software.
+
+Concept : Installing Software with GNOME Package Manager
+Description : Demonstrates searching for and installing software (example: Wireshark) via the GNOME package manager. 
+              Shows viewing package files, required packages, and dependencies.
+Purpose : To install new applications in a user-friendly way while handling dependencies automatically.
+Linux commands : (GUI tool equivalent to yum install <package>)
+Additional Info : Dependencies are automatically resolved; once installed, the software is available in the Applications menu.
+
+Concept : Updating Software with GNOME Package Manager
+Description : Shows how to check for updates and apply them through the GNOME package manager. Updates can be viewed, 
+              selected, and applied.
+Purpose : To keep the system secure and stable by applying vendor patches.
+Linux commands : (GUI tool equivalent to yum update)
+Additional Info : Updates should first be tested in a lab environment before applying on production systems.
+
+Concept : Configuring Automatic Updates in GNOME
+Description : Demonstrates setting scheduled updates (e.g., weekly) using the Software Sources menu. Can also view update logs.
+Purpose : To automate update management and reduce manual intervention.
+Linux commands : (GUI equivalent to dnf-automatic or yum-cron for scheduling)
+Additional Info : Options include checking updates on battery or mobile connections (not relevant for servers).
+
+Concept : Using the yum Command
+Description : Command-line package management with yum (Yellowdog Updater, Modified). Supports searching, installing, 
+              removing, and listing packages. Example: Installing Wireshark.
+Purpose : To manage packages via CLI for servers and advanced users.
+Linux commands :
+yum list | less → lists installed and available packages.
+yum search wireshark → searches for packages.
+yum install wireshark* → installs multiple related packages.
+yum list installed | grep wireshark → verifies installation.
+Additional Info : CLI provides faster, scriptable package management compared to GUI.
+
+Concept : Updating with yum
+Description : Demonstrates updating packages and enabling repositories from the command line. Example: updating Wireshark and system-wide updates.
+Purpose : To keep system software current with vendor patches.
+Linux commands :
+yum repolist → shows enabled repos.
+yum repolist all → shows all repos.
+yum-config-manager --enable <repo> → enables a repository.
+yum info <package> → shows version and repo info.
+yum update wireshark → updates a specific package.
+yum update → updates all packages.
+Additional Info : Always apply updates in a test environment before production.
+
+Concept : Reinstalling or Replacing Packages with yum
+Description : Shows how to reinstall packages to fix missing files, remove packages, and swap groups of packages (e.g., VNC → RDP).
+Purpose : To repair, remove, or replace packages without manual file management.
+Linux commands :
+yum list installed | grep wireshark → check installed packages.
+yum reinstall wireshark → reinstalls a package.
+yum remove wireshark or yum erase wireshark → removes package(s).
+yum swap '*vnc*' '*rdp*' → swaps package groups.
+Additional Info : Useful for repairing corrupted or incomplete installations.
+
+Concept : Configuring Software Repositories
+Description : Explains enabling repositories via CLI and GUI. Example: enabling Oracle Java repository.
+Purpose : To expand software availability beyond default repositories.
+Linux commands :
+yum repolist → shows enabled repositories.
+yum repolist all → shows all repositories.
+yum-config-manager --enable <repo> → enables a repo.
+Additional Info : Repositories can also be enabled via GNOME Software Sources tab.
+
+Concept : Using a Local Repository
+Description : Demonstrates setting up and using a custom local repository with RPM packages. 
+              Involves indexing with createrepo and creating a .repo file.
+Purpose : To control updates by using a tested, locally managed repository.
+Linux commands :
+yum list installed | grep createrepo → check if createrepo is installed.
+createrepo /custom_repo → build repository metadata.
+vi /etc/yum.repos.d/rhel-local.repo → configure new repo file.
+yum repolist → verify new repo.
+Additional Info : Local repositories are useful for enterprise environments where only approved software should be installed.
