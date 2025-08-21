@@ -1,0 +1,133 @@
+Concept : Using read Command in Shell Scripts
+Description : The read command in Linux prompts the user for input and stores the input in a variable for further processing. 
+              This is often used to capture menu choices or user-supplied data in scripts.
+Purpose : To interactively gather user input in shell scripts and make decisions based on that input.
+Linux commands :
+read variable_name : Waits for user input and stores it in variable_name.
+echo $variable_name : Prints the value stored in a variable.
+chmod +x script.sh : Makes the script executable.
+./script.sh : Runs the script in the current directory.
+Script example: Beginning----
+#!/bin/bash
+echo "Menu"
+echo "1 - List logged on users"
+echo "2 - Show kernel version"
+echo " "
+echo "Please enter your choice:"
+read menuchoice
+echo "You typed: $menuchoice"
+Script example: End----
+Additional Info : 
+-The value captured can be a string, number, or any text. 
+-Proper validation should be done to handle unexpected input.
+
+Concept : Logic Statements (if, elif, else) in Shell Scripts
+Description : Logic statements allow conditional execution of commands based on the evaluation of expressions. 
+              The if statement checks a condition, elif checks another condition if the first fails,
+              and else handles all other cases.
+Purpose : To execute different commands depending on user input or system conditions.
+Linux commands :
+[ condition ] : Tests a condition (must have spaces after [ and before ]).
+-gt, -lt, -eq : Greater than, less than, equal for numeric comparisons.
+echo "message" : Prints messages depending on the condition outcome.
+Script example: Beginning----
+#!/bin/bash
+if [ $menuchoice -eq 1 ]; then
+  clear
+  who
+elif [ $menuchoice -eq 2 ]; then
+  clear
+  uname -r
+else
+  exit
+fi
+Script example: End----
+Additional Info : 
+-if ... fi constructs end with fi. 
+-Logical operators like && can combine conditions for more complex checks.
+
+Concept : Loops (while and until) in Shell Scripts
+Description : Loops allow repeated execution of commands until a condition is met.
+              -while executes while a condition is true,
+              -until executes until a condition becomes true.
+Purpose : Automate repetitive tasks or continuously prompt the user until a specific input is given.
+Linux commands :
+while [ condition ]; do ... done : Executes commands as long as the condition is true.
+until [ condition ]; do ... done : Executes commands as long as the condition is false.
+echo "message" : Display messages during each iteration.
+Script example: Beginning----
+#!/bin/bash
+while [ $menuchoice -ne 3 ]; do
+  # commands
+done
+
+#Or use until 
+
+#!/bin/bash
+until [ $menuchoice -eq 3 ]; do
+  # commands
+done
+Script example: End----
+Additional Info : 
+-Both loops use do ... done to enclose commands. 
+-The choice between while and until depends on whether you want to loop on true or false conditions.
+
+Concept : Using test Command
+Description : The test command evaluates expressions or file attributes and returns true or false. 
+              It is often used in scripts to verify conditions.
+Purpose : To check numeric, string, or file conditions before performing actions.
+Linux commands :
+test 10 -gt 5 && echo True : Checks if 10 is greater than 5 and prints True if true.
+test -e filename : Checks if a file exists.
+test -w filename : Checks if a file is writeable.
+echo $? : Prints exit status of the last command (0 = true, >0 = false).
+Script example: Beginning----
+#!/bin/bash
+# Numeric test
+test 10 -gt 5 && echo "True"
+
+# File existence
+test -e filename
+echo $?  # 0 = exists, >0 = does not exist
+
+# Write access
+test -w filename && echo "Writeable"
+
+Script example: End----
+Additional Info : 
+-[ ] can also be used instead of test. Always include spaces inside square brackets. 
+-Useful for validating user input or file system states in scripts.
+
+Concept : Shell Expansion
+Description : Expansion replaces typed input with an expanded value before executing the command. 
+              This includes wildcard expansion, arithmetic, brace expansion, command substitution, and tilde for home directory.
+Purpose : To simplify command input, generate sequences, and store command outputs in variables.
+Linux commands :
+echo * : Expands to all files in the current directory.
+echo {6..8} : Expands to 6 7 8 (sequence generation).
+CURRENTDATE=$(date) : Command substitution to store output in a variable.
+cd ~ : Tilde expansion to home directory.
+Additional Info : 
+-Expansion helps automate repetitive tasks, generate sequences, and use command outputs directly in scripts. 
+-Arithmetic expansion also allows shell scripts to perform calculations.
+
+Concept : Exit Status in Linux
+Description : Exit status indicates whether the last executed command completed successfully (0) or failed (>0). 
+              It is stored in the built-in variable $?.
+Purpose : To check the result of a command or script execution and handle errors appropriately.
+Linux commands :
+echo $? : Prints the exit status of the previous command.
+[[ 10 -gt 5 ]] : Tests a condition without printing output; exit status can be checked via $?.
+if [ $? -eq 0 ]; then ... else ... fi : Executes commands based on the success or failure of the previous command.
+Script example: Beginning----
+#!/bin/bash
+cd /nonexistent_dir
+if [ $? -eq 0 ]; then
+  echo "No problem."
+else
+  echo "Anthony, we have a problem."
+fi
+Script example: End----
+Additional Info : 
+-Useful in scripts to chain commands, handle errors, or report issues. 
+-Can be combined with && and || operators to manage control flow.
