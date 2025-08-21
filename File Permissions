@@ -1,0 +1,101 @@
+Concept : File Ownership and Permissions
+Description : Each file and directory on a Linux filesystem has three sets of information to control access: file type, 
+              permissions, and ownership. File type is indicated by the first character in ls -l output (- for file, d for 
+              directory, l for symlink). Permissions are represented by nine flags divided into three sets for owner, group, 
+              and others. Read (4), write (2), and execute (1) combine numerically to determine permission values. 
+              Ownership identifies the user and group associated with the file or directory.
+Purpose : To control who can read, write, or execute a file or directory and to maintain proper security and collaboration.
+Linux commands :
+ls -l : Lists files with detailed information including type, permissions, owner, and group.
+chmod 660 mygroupfile.txt : Sets owner and group permissions to read/write, and others to none using numeric mode.
+chmod u=rw myfile.txt : Sets user (owner) permissions to read/write using symbolic mode.
+chown cblackwell * : Changes ownership of all files in the directory to user cblackwell.
+chgrp sales * : Changes the group associated with all files in the directory to sales.
+Additional Info : Permission numeric values are additive (read=4, write=2, execute=1). Permissions can be modified recursively using -R. Symbolic modes u, g, o, a can target user, group, others, or all.
+
+Concept : Recognizing POSIX File Security
+Description : POSIX (traditional UNIX) file system permissions control access via three sets: owner, group, and others. 
+              Read permission allows viewing file contents or directory listings, write allows modifying files or directory 
+              contents, and execute allows running files or accessing directories.
+Purpose : To understand and interpret standard UNIX permission sets and enforce proper access control.
+Linux commands :
+ls -l : Shows file type and POSIX permissions.
+chmod 755 -R Projects : Recursively sets permissions for owner (7=rwx), group (5=rx), others (5=rx).
+ls -ld Projects : Shows directory permissions without listing contents.
+Additional Info : 
+-Directories require both read and execute for listing and entering. 
+-Numeric permission values represent sums of read, write, execute for each entity.
+
+Concept : Managing File Ownership
+Description : Files have an owner and group that determine access. Ownership can be changed for files and directories, 
+              recursively if needed, to assign proper permissions to users and groups.
+Purpose : To assign correct ownership so intended users have proper access rights.
+Linux commands :
+chown mwillams * : Change owner of files in current directory.
+chown -R mwillams * : Change owner recursively in directory and subdirectories.
+chgrp software * : Change group of files in current directory.
+chgrp -R software * : Change group recursively.
+Additional Info : 
+-Owner gets first three permission bits, group gets next three, others get last three. 
+-Proper ownership ensures correct enforcement of permission rules.
+
+Concept : Managing Directory Permissions
+Description : Directories also have permissions that determine which users can read, write, or execute within them. 
+              Default permissions differ from files and are influenced by umask.
+Purpose : To manage access and collaborative use of directories while controlling creation, modification, and deletion of files.
+Linux commands :
+mkdir Shared : Creates a new directory.
+ls -ld Shared : Displays directory permissions and ownership.
+chmod 766 Shared : Sets directory permissions: owner rwx (7), group rw (6), others rw (6).
+touch Shared/newfile : Creates a new file in the directory.
+Additional Info : 
+-Newly created files inherit default permissions based on umask, not directory permissions. 
+-Sticky bit can restrict deletion rights to file owners.
+
+Concept : Access Control Lists (ACLs)
+Description : ACLs provide more granular file and directory permissions than traditional UNIX permissions, 
+              allowing multiple users or groups to have distinct permissions.
+Purpose : To give fine-grained control over who can read, write, or execute specific files or directories.
+Linux commands :
+getfacl filename : Display ACLs for a file or directory.
+setfacl -m u:aruffin:r filename : Add read permission for user aruffin.
+setfacl -m u:mwillams:rw filename : Add read/write permissions for user mwillams.
+setfacl -m g:software:rwx . : Add read/write/execute permissions for group software to the current directory.
+Additional Info : 
+-ACL entries are shown using + in ls -l. 
+-ACLs allow multiple users or groups to have custom permissions without affecting the base UNIX permissions.
+
+Concept : File System Quotas
+Description : Quotas limit disk usage by users or groups. Soft limits allow temporary excess usage during a grace period; 
+              hard limits prevent further usage once reached. Quotas require support in /etc/fstab and must be checked and 
+              enabled for each filesystem.
+Purpose : To control disk usage, prevent individual users or groups from consuming excessive space, 
+          and ensure fair resource allocation.
+Linux commands :
+vi /etc/fstab : Edit filesystem mount options to enable usrquota and grpquota.
+mount -o remount /Data : Apply new quota options without reboot.
+quotacheck -cug /Data : Create quota files for users and groups.
+edquota -u mwillams : Edit quota for a user.
+edquota -g software : Edit quota for a group.
+setquota -g projmgrs 0 5000 0 0 /Data : Set hard limit of 5000 blocks for a group.
+quotaon -vug /Data : Enable quotas.
+repquota -ug /Data : Display quota report for users and groups.
+Additional Info : 
+-Quota files (aquota.user, aquota.group) store information. 
+-Grace periods can be adjusted with edquota -t. 
+-Blocks measure disk usage; inodes track file entries.
+
+Concept : Setting Up Shared Directories for Users
+Description : Shared directories allow collaborative access for multiple users or groups. Permissions, 
+              group assignment, ACLs, and sticky bit control what users can read, write, or delete.
+Purpose : To create a collaborative workspace where users can safely share files without interfering with each other’s work.
+Linux commands :
+mkdir Shared : Create shared directory.
+chgrp sales Shared : Assign group sales to the directory.
+chmod g+w Shared : Add write permission for group.
+setfacl -m g:projmgrs:rx Shared : Grant read/execute permissions to projmgrs group using ACLs.
+chmod +t Shared : Enable sticky bit to restrict file deletion to owners.
+getfacl Shared : View ACL settings for directory.
+Additional Info : 
+-Sticky bit prevents users from deleting or renaming others’ files. 
+-ACLs allow multiple groups to have distinct permissions beyond standard UNIX permissions.
