@@ -1,0 +1,137 @@
+1) Samba Server Share
+Concept: Adding a Share to a Samba Server
+Description: Samba allows Linux systems to share files and printers with Windows clients over the SMB/CIFS protocol. 
+             By configuring smb.conf, we make Linux directories accessible on the network as if they were Windows shared folders.
+Purpose: To configure and share a Linux directory (/UserFiles) with Windows machines over the network 
+         for collaboration and file access.
+Linux Commands:
+ls /UserFiles : Lists the contents of the /UserFiles directory to verify files/subdirectories exist.
+tail /etc/samba/smb.conf : Shows the last lines of the Samba configuration file to confirm the share definition.
+testparm : Validates smb.conf syntax for errors before restarting Samba.
+service smb restart : Restarts the Samba service to apply configuration changes.
+getenforce : Displays the SELinux mode (Enforcing, Permissive, or Disabled).
+semanage fcontext -a -t samba_share_t "/UserFiles(/.*)?" : Assigns SELinux context samba_share_t to /UserFiles and its contents.
+restorecon -Rv /UserFiles : Applies the SELinux context changes recursively to the directory.
+Additional Info:
+-The [UserFiles] section in smb.conf defines the share name and properties (path, writable, public).
+-When SELinux is Enforcing, Samba requires the correct SELinux context (samba_share_t).
+-Windows users connect via \\hostname\sharename. Example: \\rhel1\UserFiles.
+
+2) SSH Server Configuration
+Concept: Configuring a Basic SSH Server
+Description: SSH (Secure Shell) allows secure remote command-line access and management of Linux systems. 
+             SSH replaces insecure protocols like Telnet by encrypting traffic.
+Purpose: To verify the SSH daemon is running, configure it through sshd_config, 
+         and demonstrate how to connect securely from Linux and Windows clients.
+Linux Commands:
+service sshd status : Checks if the SSH daemon (sshd) is active and running.
+cat /etc/ssh/sshd_config | less : Displays SSH server configuration settings.
+ifconfig : Shows the IP address of the server to connect remotely.
+ssh root@192.168.1.240 : Connects to a remote SSH server as root using its IP address.
+exit : Closes the SSH session and returns to the local system.
+Additional Info:
+-Default SSH port is 22, so firewalls must allow it.
+-First-time connections prompt for a host key fingerprint to establish trust.
+-On Windows, tools like PuTTY provide SSH access.
+-PasswordAuthentication yes in sshd_config allows password-based login (not recommended for production; use keys instead).
+
+3) HTTPd (Apache) Server Configuration
+Concept: Configuring a Basic HTTPd Server
+Description:Apache (httpd) serves HTML and web content over HTTP. By default, content is served from /var/www/html. 
+            Here, we reconfigure Apache to use a custom directory (/website).
+Purpose:To set up a simple website hosted by Apache, making it accessible to web browsers on the network.
+Linux Commands:
+yum list installed | grep http : Checks if Apache HTTP server is installed.
+cat /website/index.html : Displays the custom webpage file content.
+gedit /etc/httpd/conf/httpd.conf : Edits Apache’s configuration file to update DocumentRoot and directory permissions.
+service httpd restart : Restarts the Apache service to apply changes.
+Additional Info:
+Default HTTP port is 80.
+DocumentRoot defines where Apache looks for website files.
+Permissions in <Directory "/website"> ensure browsers can access content.
+After restarting, access the site via browser: http://rhel1/.
+
+4) Telnet Server Configuration
+Concept: Configuring a Basic Telnet Server
+Description: Telnet allows remote command-line access but sends all traffic (including credentials) in plaintext, 
+             making it insecure compared to SSH.
+Purpose: To demonstrate why Telnet is insecure by configuring it and capturing traffic with Wireshark.
+Linux Commands:
+yum list installed | grep telnet : Checks if the telnet server is installed.
+systemctl start telnet.socket : Starts the Telnet service.
+netstat -tan | grep 23 : Confirms Telnet is listening on TCP port 23.
+telnet 192.168.1.240 : Connects to the Telnet server from another host.
+Additional Info:
+-Root login is usually disabled by default in Telnet.
+-Telnet traffic can be captured with Wireshark and easily analyzed.
+-Wireshark’s “Follow TCP Stream” clearly shows usernames and passwords.
+-This insecurity is why Telnet is deprecated in favor of SSH.
+
+5) FTP Server Configuration
+Concept: Configuring a Basic FTP Server (vsftpd)
+Description: FTP (File Transfer Protocol) allows transferring files between clients and servers. 
+             vsftpd (Very Secure FTP Daemon) is a common Linux FTP server.
+Purpose: To configure an FTP server for authenticated access, set a custom banner, 
+         and transfer files from Linux to Windows clients.
+Linux Commands:
+yum list installed | grep ftp : Checks if vsftpd is installed.
+vi /etc/vsftpd/vsftpd.conf : Opens FTP configuration file.
+anonymous_enable=NO : Disables anonymous login.
+ftpd_banner=Welcome to the Quick 24x7 FTP Site : Sets custom banner.
+local_root=/var/ftp : Defines FTP root directory.
+ls /var/ftp : Lists files available in FTP root.
+service vsftpd restart : Restarts FTP service to apply changes.
+netstat -tan | grep 21 : Verifies FTP service listening on TCP port 21.
+Additional Info:
+-FTP uses port 21 (control) and port 20 (data).
+-ftpusers and user_list files control allowed/denied users.
+-On Windows, FTP client (ftp rhel1) allows downloading with mget *.rpm.
+-Graphical FTP clients (FileZilla) are often easier to use than CLI.
+
+Concept : Setting up a Squid Proxy Server
+Description : A Squid server is a proxy caching server in Linux. 
+              It acts as a middleman between clients and the internet: clients send requests to the proxy, 
+              which then fetches the content on their behalf. Squid also caches frequently accessed data, 
+              allowing subsequent requests to be served locally without re-downloading from the internet.
+Purpose : Improve performance by caching web and FTP content.
+          Provide controlled client access to internet resources.
+          Reduce bandwidth usage by serving cached content locally.
+Linux commands :
+yum list installed | grep squid : Checks if Squid is installed on the system.
+vi /etc/squid/squid.conf : Opens the Squid configuration file for editing.
+/localnet (inside vi) : Searches for the "localnet" directive in the configuration.
+service squid restart : Restarts the Squid service after configuration changes.
+netstat -tan | grep 3128 : Verifies that Squid is listening on TCP port 3128 (default proxy port).
+cat /var/log/squid/access.log : Displays Squid’s access logs to confirm client requests and caching activity.
+Additional Info :
+-The directive http_access allow localnet ensures LAN clients can use the proxy.
+-The cache_dir directive determines where cached content is stored. By uncommenting it, caching is enabled.
+-Clients (like Internet Explorer in Windows 7) must be configured to use the Squid server’s IP address and port.
+-Logs under /var/log/squid/ provide valuable information about client activity and proxy performance.
+
+Concept : Configuring a Basic Mail Server (Postfix + Dovecot)
+Description : A mail server handles both outbound mail (sending emails) and inbound mail (retrieving emails). 
+              Outbound mail is managed by an MTA (Message Transfer Agent) like Postfix, 
+              while inbound mail is handled by services like Dovecot, which supports POP3 and IMAP protocols.
+Purpose : Postfix (SMTP/MTA): Sends outbound emails to other mail servers.
+          Dovecot (POP3/IMAP): Allows clients to retrieve and read incoming emails.
+          Provides a complete mail delivery and retrieval solution for users.
+Linux commands :
+yum list installed | grep postfix : Verifies Postfix is installed.
+yum list installed | grep dovecot : Verifies Dovecot is installed.
+vi /etc/postfix/main.cf : Edits Postfix’s main configuration file.
+/mydomain and /mynetworks (inside vi) : Searches for directives defining domain and network access.
+service postfix start : Starts the Postfix service.
+systemctl enable postfix.service : Ensures Postfix starts on boot.
+netstat -tan | grep 25 : Checks if Postfix is listening on SMTP port 25.
+vi /etc/dovecot/dovecot.conf : Edits Dovecot’s configuration file.
+service dovecot start : Starts the Dovecot POP3/IMAP service.
+netstat -tan | grep 110 : Confirms Dovecot is listening on POP3 port 110.
+ping smtp.silversides.local / ping pop3.silversides.local : Tests DNS resolution for mail services.
+Additional Info :
+-Postfix requires correct domain configuration (mydomain) and allowed client networks (mynetworks).
+-Dovecot must have POP3 enabled (protocols = pop3 imap lmtp).
+-Clients (like Evolution mail in Linux) must be configured with:
+-SMTP -> smtp.domain.local (port 25) for sending mail.
+-POP3 -> pop3.domain.local (port 110) for retrieving mail.
+-Logs and DNS resolution are critical for verifying successful delivery and retrieval.
