@@ -1,0 +1,111 @@
+Concept : Input and Output Redirection
+Description : Redirecting command output from the screen to a file (> overwrite, >> append) and redirecting input from a file to a command (<). Supports combining input and output redirection.
+Purpose : Store command output in files for later use, reuse data as input for other commands, and control how data flows between commands and files.
+Linux commands :
+> : Redirect output to a file (overwrite existing content). Example: ls -R > filelisting.txt
+>> : Append output to a file. Example: who >> useraudit.txt
+< : Redirect input from a file. Example: grep -i "codey" < 2013Sales
+Combine: sort < 2013Sales > 2013Sales_sorted.txt
+Additional Info : Useful for automation, logging, and avoiding screen clutter.
+
+Concept : Pipes
+Description : Sends the output of one command directly as input to another using the pipe symbol (|). Allows chaining multiple commands together.
+Purpose : Streamline data processing without creating intermediate files.
+Linux commands :
+cat 2013Sales | sort : Sort file contents.
+
+... | grep -v "All" : Exclude matching lines.
+ifconfig eno1 | grep inet | grep -v inet6 | tr -s " " ":" | cut -d: -f3 : Extract IPv4 address.
+Additional Info : Pipes can be chained multiple times; useful for filtering, formatting, and extracting specific data.
+
+Concept : Filename Globbing
+Description : Pattern matching for filenames using wildcards and character ranges.
+Purpose : Select specific sets of files without manually listing each name.
+Linux commands :
+* : Matches any number of characters. Example: ls *2014*
+[] : Matches any single character from the set. Example: ls *201[34]*
+{} : Matches a range or list. Example: ls *{2013..2015}
+Complex: ls [HC][A-Z][0-9][0-9]???
+Additional Info : Relies on consistent naming conventions for maximum usefulness.
+
+Concept : Switching Between Shells and Users
+Description : Change active user accounts or switch command interpreters (shells) during a session.
+Purpose : Perform tasks as another user, test user environments, or use shell-specific features.
+Linux commands :
+su username : Switch user without loading their environment.
+su - username : Switch user and load their environment.
+echo $SHELL : Show current shell.
+csh, bash : Switch shells.
+Additional Info : Shell commands vary; some commands are shell-specific (e.g., setenv for C Shell).
+
+Concept : Switching Between TTY Consoles
+Description : Use multiple terminal sessions via virtual consoles (TTYs).
+Purpose : Maintain separate logins for different users or tasks simultaneously.
+Linux commands :
+Ctrl+Alt+Fn : Switch between TTY consoles (e.g., F1–F7).
+who : Show logged-in users and their TTY sessions.
+Additional Info : TTY1 often runs GUI; TTY2+ are text-based logins; pts refers to pseudo-terminals in GUI or remote sessions.
+
+Concept : Searching for Files
+Description : Locate files by name, type, user, or timestamp using recursive search.
+Purpose : Quickly find specific files within large directory structures.
+Linux commands :
+find / -name "Project*" : Search by name from root.
+find . -type f -print | wc -l : Count files.
+find -user username : Search by owner.
+find -cmin -3 : Find files modified in last 3 minutes.
+Additional Info : Searches entire filesystem unless given a starting directory; can be slow for large systems.
+
+Concept : Performing Actions on Found Files
+Description : Use find with -exec to run commands on search results.
+Purpose : Automate file management tasks (list, move, delete) based on search criteria.
+Linux commands :
+find ... -exec ls -l {} \; : List details of found files.
+find ... -exec mv {} /path \; : Move found files.
+find . -type f -size +500c -exec mv {} /UserFiles/Large \; : Move files > 500 bytes.
+Additional Info : {} is a placeholder for each result; \; ends the -exec statement.
+
+Concept : which and locate Commands
+Description : which finds executable program paths; locate searches for files using a database index.
+Purpose : Quickly find command locations or file paths.
+Linux commands :
+which ifconfig : Show full path to executable.
+locate filename : Find files using mlocate database.
+locate -i : Case-insensitive search.
+locate -c : Count matching results.
+Additional Info : locate is much faster than find but may be outdated if updatedb hasn’t recently run.
+
+Concept : Using Vim to Create and Edit Files
+Description : Vim is a modal text editor with command and insert modes.
+Purpose : Create, edit, and save text files in CLI environments.
+Linux commands :
+vim filename : Open/create a file.
+i or Insert : Enter insert mode.
+Esc : Return to command mode.
+:w : Save (write) file.
+:q : Quit.
+:wq : Save and quit.
+:q! : Quit without saving.
+Additional Info : Tab completion works in Vim when saving files with paths.
+
+Concept : Advanced Vim Commands
+Description : Edit text efficiently with delete, copy/paste, search, and replace features in command mode.
+Purpose : Improve editing speed and perform batch modifications inside files.
+Linux commands :
+dd : Delete current line.
+yy : Copy (yank) line.
+p : Paste after cursor.
+:%s/old/new/i : Search and replace (case-insensitive).
+:w, :wq : Save changes.
+Additional Info : %s affects the entire file; adding /g replaces all occurrences in each line.
+Concept : Using Emacs to Edit Files
+Description : Emacs is another CLI-based text editor with different keybindings and features than Vim.
+Purpose : Create or modify files in environments where Emacs is preferred or required.
+Linux commands :
+emacs filename : Open/create a file.
+Ctrl+X 1 : Close other panes.
+Typing directly inserts content.
+Ctrl+X Ctrl+S : Save file.
+
+Ctrl+X Ctrl+C : Exit Emacs.
+Additional Info : Emacs provides built-in help and powerful extensions; requires installation on some distros.
