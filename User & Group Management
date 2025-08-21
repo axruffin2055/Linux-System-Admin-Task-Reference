@@ -1,0 +1,144 @@
+Concept : Linux Users and Groups
+Description : Linux users are system accounts (for people or applications). Users belong to one or more groups. 
+              Default system accounts include root, daemon, lp, etc. User and group information is stored in text files 
+              like /etc/passwd, /etc/shadow, and /etc/group.
+Purpose : To manage permissions, authentication, and access control. Groups simplify permission management by 
+          applying settings to multiple users.
+Linux commands :
+cat /etc/passwd : Shows local user account information.
+cat /etc/group : Shows groups and their members.
+cat /etc/shadow : Shows encrypted passwords and aging policies.
+Additional Info :
+-/etc/passwd contains username, UID, GID, home directory, and shell.
+-/etc/shadow stores encrypted passwords and aging details.
+-/etc/group contains group name, GID, and member users.
+-Root has UID 0 and home /root.
+
+Concept : Managing Users in GNOME
+Description : Users can be managed graphically using GNOME Settings -> Users. Accounts can be created, modified, or removed. 
+              Options include Standard or Administrator accounts, setting passwords, and enabling/disabling accounts.
+Purpose : Provides a GUI method to manage accounts without command line.
+Linux commands : (GUI steps, not CLI commands)
+Add user (+) : Create new account.
+Remove user (-) : Delete account.
+Set password : Define authentication method.
+Change account type : Standard or Administrator.
+Additional Info :
+-Enterprise logins can connect to network domains.
+-Files of removed users can be preserved or deleted.
+
+Concept : Changing User Passwords
+Description : Passwords can be changed via CLI (passwd) or GUI. A user can change their own password, while root can reset any user’s password without knowing the old one.
+Purpose : To secure accounts and update forgotten passwords.
+Linux commands :
+whoami : Shows current logged-in user.
+su - username : Switch to another user.
+passwd : Change own password.
+passwd username : Root changes another user’s password.
+Additional Info :
+-GUI method available under Settings -> Users -> Password.
+-Root bypasses old password requirement.
+
+Concept : /etc/passwd and /etc/shadow Files
+Description : /etc/passwd stores user info (username, UID, GID, shell, etc.), 
+              while /etc/shadow stores encrypted passwords and password aging policies.
+Purpose : Defines how users authenticate and what restrictions apply.
+Linux commands :
+tail /etc/passwd : View last 10 users.
+tail /etc/shadow : View last 10 password entries.
+Additional Info :
+-Passwords are represented as x in /etc/passwd and stored securely in /etc/shadow.
+-Shadow fields include last password change, min/max age, expiration date, and warnings.
+
+Concept : Resetting User Passwords
+Description : Passwords can be reset by root or by editing /etc/shadow. Removing an encrypted password field 
+              for root allows login without a password until it’s reset.
+Purpose : Recover forgotten root/user passwords.
+Linux commands :
+passwd username : Reset password for a user.
+vi /etc/shadow : Manually edit shadow file to remove password hash.
+Additional Info :
+-Useful in rescue mode if root password is lost.
+-Ineffective if the disk is encrypted.
+
+Concept : Managing Users from Shell
+Description : Users can be added, modified, or deleted directly from CLI.
+Purpose : Provides full control of user accounts without GUI.
+Linux commands :
+useradd username : Add new user.
+usermod username -s /bin/csh : Change user shell.
+userdel username : Delete user.
+tail /etc/passwd | tail /etc/group : Verify entries.
+Additional Info :
+-r option with userdel removes home directory.
+-Default shell is /bin/bash.
+
+Concept : Editing /etc/passwd Directly
+Description : User properties like full name, shell, or group can be edited manually in /etc/passwd.
+Purpose : Allows manual modification of user attributes when CLI tools are not used.
+Linux commands :
+vi /etc/passwd : Edit user details directly.
+Additional Info :
+-Direct editing should be done cautiously to avoid system lockouts.
+-Same applies to /etc/shadow and /etc/group.
+
+Concept : Configuring Password Policies
+Description : Password expiration, minimum/maximum age, and warnings can be set via passwd and usermod.
+Purpose : Enforces security by requiring users to update passwords regularly.
+Linux commands :
+usermod username -e DATE : Set account expiration.
+passwd -e username : Force immediate password change.
+passwd -n DAYS username : Set min days before change.
+passwd -x DAYS username : Set max password age.
+passwd -w DAYS username : Warn user before expiration.
+Additional Info :
+-Policies are reflected in /etc/shadow.
+
+Concept : Managing Groups
+Description : Groups simplify permission assignment by grouping users together.
+Purpose : Manage shared access to files, directories, and resources.
+Linux commands :
+groupadd groupname : Create group.
+groupmod -n newname oldname : Rename group.
+groupdel groupname : Delete group.
+tail /etc/group : Verify group entries.
+Additional Info :
+-Each group has unique GID.
+-/etc/group stores group info.
+
+Concept : Adding Users to Groups
+Description : Users can be added to multiple groups for access management.
+Purpose : Provide permissions through group membership.
+Linux commands :
+usermod username -G group1,group2 : Add user to groups.
+cat /etc/group | grep groupname : Verify membership.
+Additional Info :
+-Lowercase -g sets default group.
+-Uppercase -G adds additional groups.
+
+Concept : Modifying Default Group
+Description : Each user has a primary group. This can be changed with usermod -g.
+Purpose : Defines file ownership when a user creates new files.
+Linux commands :
+usermod username -g groupname : Change primary group.
+whoami : Show current user.
+touch filename : Create file (test ownership).
+Additional Info :
+-Default group created with same name as user by default.
+-Primary group determines owning group of new files.
+
+Concept : Exercise – Users, Groups, and File Ownership
+Description : Practical task combining package updates, user/group creation, and permission management.
+Purpose : Practice real-world administration steps.
+Linux commands :
+yum update : Update system packages.
+groupadd projmgrs : Create project managers group.
+useradd mjones : Add user.
+usermod mjones -G projmgrs : Add user to group.
+mkdir /ProjFiles : Create directory.
+chown mjones /ProjFiles : Set directory owner.
+chgrp projmgrs /ProjFiles : Set group ownership.
+chmod g+w /ProjFiles : Give group write access.
+Additional Info :
+-ls -ld checks ownership and permissions.
+-Separating owner and group permissions ensures collaboration while keeping accountability
