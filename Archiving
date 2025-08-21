@@ -1,0 +1,85 @@
+Concept : Recognizing Archived and Compressed Files
+Description : Archiving and compression tools in Linux such as tar, star, ar, gzip, bzip2, xz, rar, 
+              arj, and 7zip. Archive files group multiple files into one, and compression reduces file size.
+Purpose : To save storage space, organize multiple files, and prepare data for backup or transfer.
+Linux commands :
+tar : Archive files (with optional compression)
+star : Faster tar with ACL and long filename support
+ar : Deprecated archiver, still used in development
+gzip, gunzip : Compress and decompress files
+bzip2, bunzip2, xz : Alternative compression utilities
+Additional Info : Archive ≠ compression. Archives can exist without compression, but most often they are combined.
+
+Concept : gzip and gunzip Commands
+Description : Demonstrates compressing files with gzip and decompressing them with gunzip. 
+              File extensions automatically change to .gz. Supports compressing single or multiple files using wildcards.
+Purpose : To reduce file size and restore files when needed.
+Linux commands :
+gzip filename : Compress file
+gzip *.sh : Compress multiple files
+gunzip filename.gz : Decompress file
+Additional Info : Original files are replaced by compressed versions; .gz must be decompressed before direct use.
+
+Concept : bzip2 and bunzip2 Commands
+Description : Compresses and decompresses files with .bz2 extension. Supports verbose (-v) mode and compression levels (-9). 
+              bunzip2 is an alternative decompression tool.
+Purpose : Provides stronger compression than gzip, often at the cost of speed.
+Linux commands :
+bzip2 * : Compress all files in directory
+bzip2 -d * : Decompress all
+bzip2 -v -9 *.sh : Verbose, maximum compression
+bunzip2 *.bz2 : Decompress .bz2 files
+Additional Info : Better compression ratio than gzip; widely used for source code and large text files.
+
+Concept : tar Command
+Description : Archives multiple files into a single .tar or .tar.gz file. Supports compression (-z), listing (-t), 
+              and extraction (-x). Preserves metadata such as permissions and ownership.
+Purpose : To create backups and easily move collections of files.
+Linux commands :
+tar -cvf file.tar /dir : Create archive
+tar -cvzf file.tar.gz /dir : Create compressed archive
+tar -tvf file.tar : List archive contents
+tar -zxvf file.tar.gz : Extract compressed archive
+Additional Info : The order of flags does not matter except -f must come before filename.
+
+Concept : star Command
+Description : Extended version of tar, faster with advanced features. Archives files into .star format. 
+              Retains metadata such as permissions and ownership.
+Purpose : Provides a modern, efficient alternative to tar with added capabilities.
+Linux commands :
+star -c -v -f=/Backup/file.star *.sh : Create archive
+star -t -v -f=/Backup/file.star : List contents
+star -x -f=file.star : Extract archive
+Additional Info : May need to be installed separately on some systems.
+
+Concept : tar with Compression (gzip)
+Description : Shows difference between plain tar and compressed tar (.tar.gz). 
+              Compression is added using -z option. Extraction uses -xvzf.
+Purpose : To combine archiving and compression in a single step for efficiency.
+Linux commands :
+tar -cvf file.tar /dir : Archive only
+tar -cvzf file.tar.gz /dir : Archive + compress
+tar -xvzf file.tar.gz : Extract compressed archive
+Additional Info : .tar.gz is commonly used for distributing software packages and backups.
+
+Concept : zip and unzip Commands
+Description : Creates .zip archives (with recursion -r) and extracts them using unzip. Allows deleting specific files from archive with zip -d. Works in both CLI and GUI environments.
+Purpose : Popular, cross-platform compression format; widely used for sharing and distributing files.
+Linux commands :
+zip -r /Backup/Budgets.zip Budgets : Create recursive archive
+unzip -l Budgets.zip : List contents
+zip -d Budgets.zip 2011 : Delete files from archive
+unzip Budgets.zip : Extract archive
+Additional Info : Integrated with desktop Archive Manager for GUI handling.
+
+Concept : Bash Script with tar and gzip
+Description : Creates a simple script that archives and compresses a file, sets executable permissions, locates it with find, executes it, and runs it in background with &.
+Purpose : Automates backup tasks using scripts.
+Linux commands :
+echo "hello" > datafile : Create file with content
+vi datafile : Edit file with vi
+tar -czf /Backup/data.tar.gz datafile : Archive + compress in script
+chmod +x script.sh : Make script executable
+find . -name "script.sh" : Locate script
+./script.sh & : Run script in background
+Additional Info : Demonstrates combining file manipulation, archiving, compression, and automation in shell scripting.
