@@ -1,6 +1,8 @@
 Concept : Input and Output Redirection
-Description : Redirecting command output from the screen to a file (> overwrite, >> append) and redirecting input from a file to a command (<). Supports combining input and output redirection.
-Purpose : Store command output in files for later use, reuse data as input for other commands, and control how data flows between commands and files.
+Description : Redirecting command output from the screen to a file (> overwrite, >> append) and redirecting 
+              input from a file to a command (<). Supports combining input and output redirection.
+Purpose : Store command output in files for later use, reuse data as input for other commands, and control 
+          how data flow between commands and files.
 Linux commands :
 > : Redirect output to a file (overwrite existing content). Example: ls -R > filelisting.txt
 >> : Append output to a file. Example: who >> useraudit.txt
@@ -9,11 +11,11 @@ Combine: sort < 2013Sales > 2013Sales_sorted.txt
 Additional Info : Useful for automation, logging, and avoiding screen clutter.
 
 Concept : Pipes
-Description : Sends the output of one command directly as input to another using the pipe symbol (|). Allows chaining multiple commands together.
+Description : Sends the output of one command directly as input to another using the pipe symbol (|).
+              Allows chaining multiple commands together.
 Purpose : Streamline data processing without creating intermediate files.
 Linux commands :
 cat 2013Sales | sort : Sort file contents.
-
 ... | grep -v "All" : Exclude matching lines.
 ifconfig eno1 | grep inet | grep -v inet6 | tr -s " " ":" | cut -d: -f3 : Extract IPv4 address.
 Additional Info : Pipes can be chained multiple times; useful for filtering, formatting, and extracting specific data.
@@ -98,6 +100,7 @@ p : Paste after cursor.
 :%s/old/new/i : Search and replace (case-insensitive).
 :w, :wq : Save changes.
 Additional Info : %s affects the entire file; adding /g replaces all occurrences in each line.
+
 Concept : Using Emacs to Edit Files
 Description : Emacs is another CLI-based text editor with different keybindings and features than Vim.
 Purpose : Create or modify files in environments where Emacs is preferred or required.
@@ -106,6 +109,5 @@ emacs filename : Open/create a file.
 Ctrl+X 1 : Close other panes.
 Typing directly inserts content.
 Ctrl+X Ctrl+S : Save file.
-
 Ctrl+X Ctrl+C : Exit Emacs.
 Additional Info : Emacs provides built-in help and powerful extensions; requires installation on some distros.
