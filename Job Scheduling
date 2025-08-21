@@ -1,0 +1,173 @@
+ps -aux | grep crod
+
+
+Concept: Scheduled Jobs in Linux
+Description: Linux provides three primary ways to schedule jobs: cron, at, and systemd timers. 
+Cron is used for recurring tasks (hourly, daily), at is used for one-time future jobs, and 
+systemd timers allow running jobs based on events or precise time intervals.
+Purpose: To automate repetitive or future tasks on Linux systems.
+Linux Commands:
+crontab -e : Edit user crontab
+crontab -l : List user crontab
+crontab -r : Remove user crontab
+/sbin/service crond status : Check if cron daemon is running
+/sbin/service atd status : Check if at daemon is running
+Additional Info: 
+-System-wide cron files are stored in /etc/crontab and /var/spool/cron. 
+-Cron jobs are accurate to approximately one minute; finer granularity requires systemd timers. 
+-at jobs can interpret natural language for time, e.g., at now + 15 minutes.
+Managing Jobs---short review
+Cron Jobs:
+Edit system-wide: vi /etc/crontab
+Edit user crontab: crontab -e
+Pause daemon: kill -STOP <PID>
+Resume daemon: kill -CONT <PID>
+At Jobs:
+View: atq
+Remove: atrm <job-id>
+Show commands: at -c <job-id>
+SystemD Timers:
+Enable: systemctl enable <service>
+Start: systemctl start <service>
+Check active timers: systemctl list-units | grep <timer-name>
+
+Concept: Cron Jobs
+Description: Cron is a Linux utility for scheduling recurring tasks, handled by the crond daemon. 
+             Users with permissions can create jobs in their crontab. System-wide cron jobs include the username field, 
+             while user-specific crontabs do not.
+Purpose: Automate repetitive tasks at fixed intervals.
+Linux Commands:
+man crontab : View crontab command manual
+man 5 crontab : View crontab configuration manual
+ls /etc/cron* : List cron-related files and directories
+cat /etc/crontab : View system-wide crontab file
+ls -ld /var/spool/cr* : View directory for user cron jobs
+Scheduling Examples
+Cron Job Example (system-wide):
+*/2 * * * * root date >> /logged_in_users.txt; (date is a command the show today's date)
+who >> /logged_in_users.txt (runs every 2 minutes as root, appending date and logged-in users to a file)
+User Cron Job Example:
+* * 1 */2 0 history -c; echo "History cleared on $(date)" >> ~/history.log
+Additional Info: 
+Daemon: crond
+Files: (Use either or .allow or .deny)
+/etc/cron.allow
+/etc/cron.deny
+/var/spool/cron (user crontab files)
+---
+Behavior:
+If cron.allow exists, only users listed can use cron.
+If cron.allow doesn’t exist, users in cron.deny cannot use cron.
+Crontab Format (System-Wide):
+minute : hour : day-of-month : month : day-of-week : username : command
+Day of week: 0 or 7 = Sunday, or Sun
+* = every unit
+*/10 = every 10 minutes
+---
+Crontab Commands:
+crontab -e : Edit current user crontab
+crontab -l : List user crontab
+crontab -r : Remove user crontab
+---
+System-Wide Crontab:
+Located at /etc/crontab
+Includes variables like SHELL and PATH
+Format includes the username for the command
+Cron Accuracy: ~1 minute
+
+Concept: At Jobs
+Description: at is used for scheduling one-time jobs, managed by the atd daemon. 
+             Users must have permission via at.allow or at.deny files. 
+             Jobs are queued and executed at specified times.
+Purpose: Schedule one-time tasks at a specific future date or time.
+Linux Commands:
+at 10pm Jan 30 : Schedule job for Jan 30 at 10 PM
+at now + 15 minutes : Schedule job 15 minutes from now
+atq : View queued jobs
+atrm <job-id> : Remove a queued job
+at -c <job-id> : View commands in a queued job
+At Job Example:
+at 10pm Jan 30
+tar -czvf /Backup/yearend.tar.gz /UserFiles : Compress /UserFiles into a backup file using at for scheduling
+echo "Backup completed on $(date)" >> /Backups/log.txt
+Ctrl+D
+Additional Info: 
+-Jobs entered interactively are confirmed with Ctrl+D. 
+-at supports natural language times (at noon). 
+-Commands cannot be modified once scheduled; remove and resubmit if changes are needed.
+
+Concept: SystemD Timers
+Description: systemd timers are modern replacements for cron, allowing highly precise recurring or event-based scheduling. 
+             Each timer requires a .service file (what to run) and a .timer file (when to run it).
+Purpose: Provide precise, flexible scheduling beyond cron’s 1-minute granularity.
+Linux Commands:
+Files stored in /etc/systemd/system
+.service file example:---Beginning
+[Unit]
+Description=Script 10
+[Service]
+Type=simple
+ExecStart=/UserFiles/Scripts/script10.sh
+[Install]
+WantedBy=multi-user.target
+---End
+.timer file example:---beginning
+[Unit]
+Description=Execute Script 10 every 10 seconds
+[Timer]
+OnUnitActiveSec=10s
+Unit=script10.service
+---End
+systemctl enable script10.service : Enable service
+systemctl start script10.service : Start service
+systemctl list-units : List active units
+Additional Info: 
+-Timers can be triggered by boot, calendar events, or fixed intervals. 
+-Granularity can reach microseconds (usec), much finer than cron’s minute-level scheduling.
+
+Concept: Converting Cron Jobs to SystemD Timers
+Description: Existing cron jobs can be migrated to systemd timers by disabling the cron job 
+             and creating corresponding .service and .timer files.
+Purpose: Benefit from systemd’s precision, logging, and event-driven execution.
+Linux Commands:
+Goto /etc/crontab and use vim then comment out cron job (using # symbol) in /etc/crontab you want to convert.
+Create Script12.service file for the script
+[Unit]
+Description=Script 12
+
+[Service]
+Type=simple
+ExecStart=/UserFiles/Scripts/script12.sh
+
+[Install]
+WantedBy=multi-user.target
+
+Create Script12.timer file with OnCalendar or OnUnitActiveSec directives
+[Unit]
+Description=Mon-fri 2025-*-1 12:00:00
+
+[Timer]
+OnCalendar=Mon-fri 2025-*-1 12:00:00
+unit=script12.service
+systemctl enable script11.service : Create symbolic links for service
+systemctl start script11.service : Start service
+Additional Info: 
+-systemd timers allow scheduling with years, months, days, and even seconds 
+ or milliseconds—unlike cron, which is limited to minutes.
+
+Concept: File System Exercises
+Description: Tasks include searching for files containing a specific username, listing ACLs, 
+             finding executable files, and scheduling jobs using at, cron, and systemd timers.
+Purpose: Practice Linux file system navigation, permissions, scripting, and job scheduling.
+Linux Commands:
+grep -R "powell" * : Search recursively for files containing “powell”
+getfacl ~ : Display ACL for home directory
+getfacl ~/* : Display ACL for all files in home
+find ~ -maxdepth 1 -type f -executable : List executable files in home directory
+Scheduling jobs:
+At job: at 9pm Friday -> init 6 -> Ctrl+D
+Cron job: 30 22 * * * /UserFiles/Backup.sh
+Systemd timer: .service + .timer → enable & start
+Additional Info: 
+-Scripts can automate repetitive file searches and backups. 
+-Cron jobs allow recurring schedules, while systemd timers allow precise, event-driven control.
