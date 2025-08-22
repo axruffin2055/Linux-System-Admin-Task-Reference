@@ -1,0 +1,98 @@
+Concept: Kickstart Automation Overview
+Description: Kickstart automates Red Hat Enterprise Linux installations using an answer file that provides
+             configuration for OS setup, disk partitioning, package selection, authentication, networking, and more.
+Purpose: Streamline installation for single or multiple systems, eliminate manual input, enforce consistency.
+Linux commands:
+ksvalidator <file> : Validates a kickstart file for correct formatting. Returns no output if valid; errors/warnings if invalid.
+virt-install --name <vm> --ram <MB> --disk path=<path>,size=<GB> --cdrom <iso> --extra-args "ks=http://server/ks.txt" 
+             : Installs a VM using a kickstart file hosted on HTTP server.
+Additional Info: 
+-Kickstart files can include encrypted root passwords (rootpw --iscrypted), 
+ static IPs, SELinux/firewall settings, and pre/post installation scripts. 
+-Files can be generated manually from /root/anaconda-ks.cfg or using the Red Hat Kickstart Generator web tool.
+
+Concept: Dracut
+Description: Dracut generates an initramfs image used by the kernel to preload necessary drivers for root filesystem access.
+Purpose: Ensures correct boot of Linux systems, speeds up boot by including only necessary modules, 
+         troubleshooting disk and root filesystem issues.
+Linux commands:
+dracut : Generates initramfs for the current running kernel.
+dracut -f : Forces overwriting of an existing initramfs image.
+ls -l /boot/init* : Lists initramfs images to verify creation.
+dmesg | grep dracut : Checks kernel messages for dracut-related warnings/errors.
+Additional Info: 
+-Use rdshell in grub to drop into an interactive dracut shell for boot troubleshooting. 
+-Dracut images are typically system-specific due to hardware module inclusion.
+
+Concept: Active Directory Enrollment via Kickstart
+Description: Automates Linux installation and enrollment into an Active Directory (AD) domain using kickstart.
+Purpose: Integrate Linux servers with AD for centralized authentication using Kerberos 5.
+Linux commands:
+adcli create-computer <hostname> --domain=<domain> --one-time-password=<password> : Prestages a Linux computer account in AD.
+ldapsearch -x -H ldap://<domain-controller> -b "dc=example,dc=com" "(uid=<user>)" : Verifies connectivity to AD and retrieves account attributes.
+Additional Info: 
+-In kickstart, enable Kerberos authentication and specify the AD domain, KDC, 
+ and host computer account with one-time password. 
+-Automates joining the AD domain without user intervention.
+
+Concept: Installing RHEL 7 via Kickstart Script
+Description: Uses a kickstart script to fully automate installation of Red Hat Enterprise Linux 7.
+Purpose: Standardize OS installations, reduce manual input, allow network-based automation.
+Linux commands:
+virt-install --name <vm> --ram 1024 --disk path=/var/lib/libvirt/images/<vm>.qcow2,size=20 --cdrom /path/to/dvd.iso 
+             --extra-args "ks=http://server/ks.txt ip=dhcp" : Installs a VM using kickstart file from a web server.
+Additional Info: 
+-Kickstart scripts can reside on CD/DVD, USB, PXE server, or HTTP server. 
+-Parameters include root password, packages, disk layout, hostname, and networking. 
+-DHCP can be used for network-based retrieval.
+
+Concept: Installing Guest VM with Kickstart
+Description: Combines kickstart automation with virtualization to deploy guest virtual machines.
+Purpose: Quickly deploy consistent Linux VMs using automated installation.
+Linux commands:
+virt-install --name dbserv --ram 1024 --disk path=/var/lib/libvirt/images/dbserv.qcow2,size=10 --cdrom /path/to/dvd.iso 
+             --extra-args "ks=http://192.168.1.201/ks.txt ip=dhcp" : Deploys VM dbserv using kickstart file on HTTP server.
+Additional Info: 
+-Monitor installation via Virtual Machine Manager GUI. 
+-Kickstart ensures preconfigured hostname, SSH firewall exception, SELinux settings, 
+ and other system parameters are applied during VM setup.
+
+Concept: SystemTap
+Description: SystemTap is a diagnostic tool and scripting language to monitor and analyze Linux system performance.
+Purpose: Extract, filter, and summarize real-time system data for disk, process, and network events; 
+         customize output; troubleshoot performance.
+Linux commands:
+stap <script.stp> : Executes a SystemTap script.
+Example: stap tcp_connections.stp : Monitors and reports TCP connections in real-time.
+Additional Info: 
+-Scripts are saved with .stp extension. 
+-SystemTap uses Kprobes to hook into kernel events. 
+-Scripts can be downloaded from repositories or custom-built for specific diagnostics.
+
+Concept: Bug Reports and Crash Notifications (ABRT)
+Description: Red Hat Enterprise Linux can generate crash reports and notify developers about kernel 
+             or application failures using ABRT.
+Purpose: Collect, summarize, and optionally submit crash information to Red Hat for fixes.
+Linux commands:
+systemctl is-active abrtd : Checks if ABRT daemon is running.
+abrt-cli list : Lists all recorded issues.
+gnome-abrt : Opens GUI to view, delete, or report crash events.
+cat /var/tmp/abrt/<subdir>/cmdline : Shows kernel boot parameters related to crash.
+Additional Info: 
+-ABRT logs include kernel info, package, user, and timestamps. 
+-Can selectively report issues or automatically submit them to Red Hat. 
+-GUI allows easier inspection and submission.
+
+Concept: Linux Kernel Patching (Live Patching)
+Description: Applies updates to the Linux kernel without rebooting the system using kpatch.
+Purpose: Reduce downtime while applying urgent security or driver fixes.
+Linux commands:
+kpatch install <patch> : Installs a kernel patch.
+kpatch load <patch> : Activates a patch immediately.
+kpatch list : Lists applied patches.
+kpatch unload <patch> : Removes a loaded patch.
+yum install kpatch : Installs kpatch utility.
+Additional Info: 
+-Live kernel patching works on kernel 3.9+. 
+-Updates are redirected at runtime from old to new function implementations. 
+-Full kernel upgrades may still require reboots, but security fixes can be applied immediately.
