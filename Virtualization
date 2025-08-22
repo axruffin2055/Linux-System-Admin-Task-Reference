@@ -1,0 +1,237 @@
+Concept : Identifying Red Hat Virtualization Tools
+Description: Available Red Hat Virtualization tools on a RHEL host, includes the command-line and graphical utilities.
+Purpose: Ensure proper virtualization software is installed and discover available management commands.
+Linux commands:
+yum list installed *kvm* : Lists all installed packages containing "kvm" in their name; 
+                           useful to verify KVM and QEMU components.
+yum list installed *virt* : Lists all installed packages related to virtualization (like virt-viewer).
+virt<TAB><TAB> : Tab completion to list all commands beginning with virt, virt-install, virt-viewer.
+man virt-install : Opens the manual for virt-install to understand command syntax and options.
+virsh : Command-line shell for managing virtual machines.
+man virsh : Opens manual for virsh command, explaining domain management, snapshots, and other VM operations.
+Additional Info: 
+-Graphical tool Virtual Machine Manager can also list all virtual machines and manage them. 
+ This is typically found in Applications -> System Tools.
+
+Concept : Configuring Red Hat Virtualization Tools
+Description: Shows configuring Virtual Machine Manager GUI and using virsh shell for managing VMs.
+Purpose: Customize virtualization settings for efficient VM management.
+Linux commands:
+virsh help | more : Lists all available virsh commands with paging.
+man virsh : Provides detailed help on virsh commands and options.
+gedit /etc/libvirt/qemu/qemu.conf : Opens the configuration file for libvirtd daemon to modify VNC, 
+                                    graphics, or SELinux options.
+service libvirtd status : Checks if the virtualization daemon is running.
+Additional Info: 
+-GUI preferences include polling interval, graphics type, USB redirection, and storage format. 
+-Command line provides detailed VM lifecycle control.
+
+Concept : Using RHEL 7 as a Virtualized Guest
+Description: Demonstrates how to interact with a running VM guest via CLI and GUI.
+Purpose: Access, monitor, and manage VMs from host.
+Linux commands:
+virsh list : Lists running VMs.
+virsh dominfo <vm-name> : Shows domain info: state, CPUs, RAM, autostart, etc.
+virsh snapshot-create <vm-name> : Creates a snapshot of a running VM.
+virsh console <vm-name> : Connects to VM console from host terminal. Use Ctrl+] to exit.
+fdisk -l /dev/sdb : Shows partitions on a redirected USB device.
+mount /dev/sdb1 /mnt : Mounts USB device for access inside VM.
+ls /mnt : Lists contents of mounted device.
+Additional Info: 
+-GUI Virtual Machine Manager also allows console access, snapshot management, 
+ USB redirection, display scaling, and VM operations like pause, shutdown, or reboot.
+
+Concept : Installing RHEL 7 as a Virtualization Guest
+Description: Shows creating a VM using virt-install or the graphical Virtual Machine Manager.
+Purpose: Deploy a new RHEL 7 guest VM.
+Linux commands:
+man virt-install : Displays options for specifying RAM, CPUs, disk image, boot media, network, and installation source.
+virt-install --name rhel7.0 --ram 2048 --vcpus 2 --disk path=/var/lib/libvirt/images/rhel7.0.qcow2,size=8 
+             --cdrom /path/to/rhel7.iso --network network=default : Creates a VM from ISO with specified configuration.
+GUI alternative: Applications → System Tools → Virtual Machine Manager → File → New Virtual Machine → follow wizard.
+Additional Info: 
+-VM creation GUI allows setting RAM, CPU, storage, networking, and MAC address. 
+-Installation behaves like physical host installation.
+
+Concept : Launching RHEL 7 as a Guest
+Description: Demonstrates starting VMs via GUI or CLI.
+Purpose: Power on virtual machines and connect to console immediately.
+Linux commands:
+virsh start rhel7.0 --console --force-boot : Starts VM and attaches console, forcing a fresh boot.
+GUI method: Applications -> System Tools -> Virtual Machine Manager -> select VM -> Play or Run.
+Additional Info: 
+-Console allows viewing startup messages directly from host. 
+-GUI shows VM state updates in real-time.
+
+Concept : Configuring a RHEL 7 Guest
+Description: Configure VM hardware via GUI or command line (virsh).
+Purpose: Modify memory, CPUs, NICs, and other virtual hardware for a VM.
+Linux commands:
+virsh list --all : List all guests.
+virsh dominfo <vm-name> : Shows current VM configuration.
+virsh setmem <vm-name> --size 1G : Sets memory allocation for the VM.
+virsh edit <vm-name> : Opens XML config to modify VM hardware or settings.
+Additional Info: 
+-GUI: Virtual Machine Manager -> View -> Details allows changing CPU, memory, 
+      NIC model (virtio for performance), and applying changes.
+
+Concept : Configuring International Keyboards
+Description: Configures language and keyboard layout in GUI and CLI.
+Purpose: Support multiple languages for host and guest systems.
+Linux commands:
+localectl status : Shows current language and keyboard configuration.
+localectl list-keymaps | grep french : Lists French keyboard layouts.
+localectl set-x11-keymap cm-french : Sets graphical X11 keyboard layout.
+localectl set-keymap cm-french : Sets console keymap.
+Additional Info: 
+-GUI: Applications -> System Tools -> Settings -> Keyboard -> Typing -> Input Sources -> Select language.
+
+Concept : Detecting Problems in a Guest
+Description: Configure pvpanic to report VM panic events.
+Purpose: Enable VM crash detection and management.
+Linux commands:
+virsh list --all : Lists VMs.
+virsh edit <vm-name> : Modify XML to add <panic> element in <devices> section.
+Additional Info: 
+-GUI: Virtual Machine Manager -> View -> Details -> Panic Notifier shows configured ISA address for pvpanic.
+
+Concept : Using sVirt to Protect Guests
+Description: Explains SELinux integration (sVirt) to isolate VMs.
+Purpose: Prevent one compromised VM from affecting others or the host.
+Linux commands:
+getenforce : Check SELinux mode (Enforcing, Permissive, Disabled).
+virsh dumpxml <vm-name> | grep label : Shows security label of VM.
+ls -laZ <disk-file> : Shows SELinux security label of VM disk.
+Additional Info: 
+-Dynamic labeling by default ensures VMs and disk files are isolated. 
+-Useful for multi-tenant virtualization.
+
+Concept : Using RHEL 7 as a Virtualization Host
+Description: Considerations for hosting multiple VMs.
+Purpose: Optimize hardware and host configuration for multiple concurrent guests.
+Linux commands:
+No specific commands; mainly system planning.
+Additional Info: 
+-Consider RAM, CPU cores, disk, BIOS virtualization settings (VT-x/AMD-V), NICs, SR-IOV, 
+ PCI passthrough, clustering, and storage locations.
+
+Concept : Configuring RHEL 7 Host Settings
+Description: Shows host networking, virtual bridges, and VM networking configuration.
+Purpose: Ensure proper connectivity and virtual networking for guests.
+Linux commands:
+yum list installed *qemu* : Verify installed virtualization packages.
+ifconfig : Display network interfaces, including virbr0 and vnetX.
+virsh net-list --all : Show virtual networks.
+virsh net-dumpxml default : Display virtual network XML configuration.
+brctl show : Show bridge interfaces and connected VMs.
+virsh dumpxml <vm-name> | grep network : Check VM network configuration in XML.
+Additional Info: 
+-Virtual bridges (virbr0) enable NAT for guest VMs; vnet interfaces correspond to active VMs.
+
+Concept : Creating and Managing Virtual Machines
+Description: How to create, configure, snapshot, and clone VMs.
+Purpose: Deploy new VMs and manage existing VMs effectively.
+Linux commands:
+virt-install : Create VM with parameters for RAM, CPUs, disk, network, and install source.
+virsh list --all : List all VMs, running or stopped.
+virsh dumpxml <vm-name> : View XML configuration of a VM.
+virsh edit <vm-name> : Modify VM configuration via XML.
+virsh dominfo <vm-name> : Get basic VM info.
+virsh setmem <vm-name> --size <size> : Adjust VM memory allocation.
+virsh snapshot-create <vm-name> : Create a snapshot for backup or testing.
+Additional Info: 
+-GUI: Virtual Machine Manager allows snapshots, cloning, pause, shutdown, and migration.
+
+Concept : Accessing a Virtual Machine Console
+Description: Access VM console via CLI, VNC, or SSH.
+Purpose: Monitor VM activity and interact with the guest system.
+Linux commands:virsh list : Shows active VMs.
+virsh console <vm-name> : Connects directly to VM console; exit via Ctrl+].
+virsh domdisplay <vm-name> : Shows available VNC session.
+vncviewer localhost:1 : Connect to VM console via VNC.
+virsh dumpxml <vm-name> | grep graphic : Verify VM VNC configuration in XML.
+virsh edit <vm-name> : Modify XML for VNC support.
+ssh root@<vm-ip> : Connect to VM via SSH.
+Additional Info: 
+-Console access allows embedded command-line interaction similar to being directly logged into the guest OS.
+
+Concept: Starting and Stopping a Virtual Machine Guest
+Description: Demonstrate how to list, start, and stop virtual machine guests on a 
+             Linux host using both the command line (virsh) and graphical Virtual Machine Manager.
+Purpose: To manage virtual machines’ power state efficiently and understand graceful vs forced shutdowns.
+Linux commands:
+virsh list --all : Lists all virtual machines on the host, including those that are powered off. Shows their IDs, names, and states.
+virsh start <guest_name> : Starts a virtual machine with the specified name. This is equivalent to "Power On" in the GUI.
+virsh shutdown <guest_name> : Gracefully shuts down the virtual machine. Uses the guest OS shutdown procedure.
+virsh destroy <guest_name> : Forces the virtual machine off immediately. Not graceful; should be used only if shutdown hangs.
+virsh list : Lists currently running virtual machines with assigned IDs.
+Additional Info:
+-The graphical Virtual Machine Manager provides a visual CPU usage chart for each guest.
+-Force options like destroy or "Force Off" bypass guest OS operations and should be used cautiously.
+-Virtual machines may require user input during shutdown or reboot, depending on OS configuration.
+
+Concept: Configuring Guests to Autostart
+Description: How to configure a virtual machine to start automatically 
+             when the host boots, both via GUI and command line.
+Purpose: To ensure critical virtual machines are available immediately after host boot without manual intervention.
+Linux commands:
+virsh list : Lists all virtual machines with their current state.
+virsh autostart <guest_name> : Marks a virtual machine to start automatically at host boot.
+virsh autostart --disable <guest_name> : Disables autostart for the specified virtual machine.
+virsh dominfo <guest_name> : Provides detailed information about a virtual machine, including 
+                             autostart status, state, ID, CPUs, and memory.
+Additional Info:
+-The GUI Virtual Machine Manager provides an "Autostart" checkbox under Boot Options.
+-Autostart status can be verified with dominfo, showing Autostart: enabled/disabled.
+-Autostart can simplify server management in production environments.
+
+Concept: Obtaining Guest Information
+Description: How to retrieve information about virtual machine guests 
+             using GUI tools and the virsh command line.
+Purpose: To inspect guest configuration, resource usage, and state to monitor and manage virtual machines effectively.
+Linux commands:
+virsh domstate <guest_name> : Displays the current state of a guest (running, paused, shut off).
+virsh dominfo <guest_name> : Shows detailed information including ID, UUID, memory, CPU count, and autostart status.
+virsh vcpuinfo <guest_name> : Lists virtual CPU configuration of the guest.
+virsh domiflist <guest_name> : Lists network interfaces attached to the guest.
+virsh screenshot <guest_name> : Captures a screenshot of the running guest’s display.
+virsh dumpxml <guest_name> | more : Outputs the entire XML configuration of the guest, 
+                                    showing all hardware and software settings.
+Additional Info:
+-GUI tools show CPU usage and provide access to the guest console for direct login.
+-The XML dump can be used to replicate or backup VM configurations.
+-The information retrieved helps in troubleshooting performance or configuration issues.
+
+Concept: Throttling Guest I/O and Managing Performance
+Description: Monitor virtual machine performance and tuning disk I/O to prevent one VM 
+             from degrading host or other VMs’ performance.
+Purpose: To optimize resource allocation and prevent performance bottlenecks in a virtualized environment.
+Linux commands:
+virt-top : Similar to top, but displays running virtual machines with resource usage stats (CPU, memory).
+virsh dominfo <guest_name> : Provides CPU, memory, and basic info of a guest.
+virsh cpu-stats <guest_name> : Displays CPU usage per virtual CPU and total CPU consumption.
+man virsh : Accesses the manual for virsh, useful to find options like blkdeviotune.
+virsh blkdeviotune <guest_name> --path /dev/vda --total-bytes-sec 10485760 : Example of setting I/O limits (total bytes/sec) for a virtual disk.
+Additional Info:
+-Graphical Virtual Machine Manager allows monitoring of CPU, memory, disk, and network usage.
+-Disk I/O is a major contributor to host performance degradation; tuning it ensures fair resource allocation.
+-CPU stats and I/O limits can be adjusted dynamically without shutting down the guest.
+
+Concept: Setting Up a Virtualization Host and Installing Guests via Kickstart
+Description: Preparing a host for virtualization, creating a kickstart script, and installing a 
+             guest OS automatically with resource management.
+Purpose: To automate guest installation, verify host readiness, and configure resource limits for virtual machines.
+Linux commands:
+yum list installed | grep qemu : Checks if virtualization packages like QEMU are installed.
+yum install qemu-kvm libvirt virt-install : Installs necessary packages if missing.
+cat /proc/meminfo : Verifies available RAM on the host.
+ifconfig : Checks network connectivity for guest communication.
+virt-install --name rhel7.0 --ram 2048 --disk path=/var/lib/libvirt/images/rhel7.0.qcow2,size=20 --vcpus 2 
+             --os-variant rhel7.0 --graphics vnc --cdrom /path/to/iso --extra-args "ks=http://server/ks.txt" 
+             : Installs a virtual machine using a kickstart file, with specified CPU, RAM, disk, and VNC graphics.
+GUI Virtual Machine Manager can also start, monitor, and configure performance for the guest after installation.
+Additional Info:
+-Kickstart files automate OS installation by specifying root password, disk partitioning, network, 
+ software packages, and scripts.
+-Web-hosted kickstart files allow network-based installation.
+-IO tuning for virtual disks can be applied in GUI or via virsh blkdeviotune for consistent guest performance.
