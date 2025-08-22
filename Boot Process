@@ -1,0 +1,185 @@
+Concept : Linux Boot Process
+Description : The Linux boot process starts with BIOS or UEFI initializing hardware and checking POST, then passing control 
+              to the boot loader (GRUB2 or systemd-boot).The boot loader loads the kernel and initramfs (initrd), 
+              then the kernel mounts the root filesystem and starts the first process (init in legacy, systemd in modern systems).
+              Services are initialized according to runlevels (SysVinit) or targets (systemd).
+Purpose : To properly initialize hardware, load the kernel, mount filesystems, 
+          and launch services required for a functional Linux system.
+Linux commands :
+
+dmesg : Displays kernel boot messages. Example: dmesg | less lets you scroll hardware initialization logs.
+
+journalctl -b : Shows system logs for the current boot. Example: journalctl -b -1 checks logs from the previous boot for errors.
+
+uname -r : Displays the kernel version loaded during boot.
+
+runlevel : Shows previous and current runlevels. Example: runlevel outputs N 5 when in graphical mode.
+
+init 0 : Switches to runlevel 0 and powers off the machine.
+
+init 6 : Switches to runlevel 6 and reboots the system.
+
+Used Cases: 
+-Diagnosing failed boots, customizing kernel parameters for performance, 
+ switching to single-user mode for recovery,preparing systems for multi-OS environments.
+Important detailed points:
+-Systemd replaces init as PID 1 on modern Linux.
+-Initramfs provides drivers and tools before root filesystem is mounted.
+-Runlevels 0-6 exist in SysVinit but map to systemd targets like multi-user.target or graphical.target.
+Additional Info :
+-In LPIC exams, expect questions comparing init vs systemd, runlevels vs targets, and steps of boot order.
+-Troubleshooting skills (checking dmesg, journalctl) are practical exam points.
+-Boot process knowledge is essential when configuring secure boot or custom kernels.
+
+Concept : Configuring the Boot Loader
+Description : The boot loader (commonly GRUB2) controls how the kernel is loaded, with parameters and optional OS choices.
+Configuration files (/etc/default/grub and /etc/grub.d/) define timeout, kernel parameters, and custom entries.
+Purpose : To customize kernel options, dual-boot setups, performance tuning, and system security via boot-time parameters.
+Linux commands :
+
+cat /boot/grub2/grub.cfg | more : Displays auto-generated config but warns not to edit directly.
+
+gedit /etc/default/grub & : Opens editable GRUB config file where GRUB_TIMEOUT and GRUB_CMDLINE_LINUX parameters are set.
+
+grub2-mkconfig -o /boot/grub2/grub.cfg : Regenerates grub.cfg with new settings.
+
+gedit /etc/grub.d/40_custom & : Allows creation of custom boot entries, dual-boot with Windows.
+Used Cases: 
+-Extending boot menu, disabling IPv6 with kernel parameters, enabling zswap for performance, creating custom OS entries.
+Important detailed points:
+-Do not edit grub.cfg directly; always edit source files and rebuild.
+-Chainloading lets GRUB call another boot loader (Windows Boot Manager).
+-Kernel parameters alter runtime behavior before init/systemd loads.
+Additional Info :
+-In LPIC, expect to edit GRUB files, regenerate grub.cfg, and explain chainloading.
+-Know differences between GRUB Legacy and GRUB2 (syntax and config locations).
+-Password protection of GRUB entries may appear as a security-related exam topic.
+
+Concept : Setting the Runlevel
+Description : Runlevels (legacy init) and targets (systemd) define system states such as shutdown, multi-user text, 
+              or graphical login.Red Hat Enterprise Linux 7+ defaults to systemd but maintains backward compatibility 
+              with init commands.
+Purpose : To control system mode, manage available services, and optimize resources.
+Linux commands :
+
+pstree | more : Displays process tree, confirming if systemd is PID 1.
+
+runlevel : Shows current and previous runlevels. Example: runlevel outputs 3 5 (was in 3, now in 5).
+
+init 3 : Switches to runlevel 3 (multi-user, no GUI).
+
+init 5 : Switches to runlevel 5 (graphical environment).
+
+init 0 : Powers down system.
+
+init 6 : Reboots system.
+
+Used Cases: 
+Servers running in CLI-only mode, desktops needing GUI, reboot and shutdown management.
+Important detailed points:
+-/etc/inittab is deprecated with systemd, but still tested in LPIC exams.
+-Systemd targets map directly to runlevels (multi-user.target = runlevel 3, graphical.target = runlevel 5).
+-Runlevels/targets start/stop associated daemons dynamically.
+Additional Info :
+-LPIC expects knowledge of legacy init commands (init, runlevel) and modern equivalents 
+ (systemctl isolate, systemctl set-default).
+-Runlevels/targets management is key in troubleshooting GUI vs CLI login issues.
+
+Concept : Booting from MBR or GPT
+Description : MBR (Master Boot Record) supports 4 primary partitions and 2TB max disk size. GPT (GUID Partition Table) 
+              supports up to 128 partitions and larger disks, required by UEFI boot.
+Purpose : To ensure compatibility between hardware, firmware, and Linux installation.
+Linux commands :
+
+fdisk -l /dev/sda : Displays partition table for MBR disks.
+
+gdisk -l /dev/sda : Displays partition table for GPT disks.
+
+mount | grep efi : Confirms EFI partition mounted on /boot/efi.
+
+ls /boot/efi/EFI/BOOT : Shows EFI boot files required for GPT/UEFI.
+
+Used Cases: 
+-Linux installation on >2TB disks, dual-boot with Windows (UEFI), ensuring correct partitioning scheme.
+Important detailed points:
+-MBR is limited and legacy; GPT is modern and required for UEFI.
+-UEFI boot requires EFI System Partition formatted as FAT32.
+-GPT adds redundancy by storing partition table at disk beginning and end.
+Additional Info :
+-In LPIC, candidates should know fdisk (MBR) vs gdisk (GPT).
+-Expect exam questions on GPT advantages, EFI requirements, and dual-boot compatibility.
+-GPT improves reliability and scalability over MBR.
+
+Concept : Changing the Boot Target
+Description : Systemd replaces runlevels with targets that define boot state.Default target determines whether the system starts in GUI or CLI.
+Purpose : To configure persistent boot mode or temporarily switch modes for troubleshooting.
+Linux commands :
+
+systemctl list-units -t target : Lists available targets.
+
+systemctl get-default : Shows default boot target.
+
+systemctl set-default multi-user.target : Sets default to CLI mode.
+
+systemctl set-default graphical.target : Sets default to GUI mode.
+
+systemctl isolate multi-user.target : Switches to target immediately (runtime only).
+Used Cases: Setting servers to boot in CLI, troubleshooting graphics issues, managing resource usage.
+Important detailed points:
+-Systemd uses symbolic links in /etc/systemd/system/default.target.
+-Multi-user.target ≈ runlevel 3, graphical.target ≈ runlevel 5.
+-Temporary vs persistent target changes matter for troubleshooting.
+Additional Info :
+-LPIC exams may test mapping between runlevels and systemd targets.
+-Systemctl isolate is tested as equivalent to init commands.
+-Admins often switch default to multi-user.target for server performance.
+
+Concept : Interrupting the Boot Process
+Description : Boot can be interrupted at GRUB to enter single-user mode or maintenance shell, 
+              allowing repairs or password resets.
+Purpose : To recover from failed boot or reset lost root password.
+Linux commands :
+
+Press e in GRUB : Enters edit mode for kernel boot parameters.
+
+Replace ro with rw init=/sysroot/bin/sh : Boots into shell with write access.
+
+chroot /sysroot : Switches root to system environment.
+
+passwd root : Resets root password.
+
+Used Cases: 
+-Root password recovery, repairing corrupted filesystems, emergency system maintenance.
+Important detailed points:
+-Physical access is critical because GRUB editing bypasses root password.
+-chroot allows using full system tools from emergency shell.
+-Must remount filesystem read-write to reset password.
+Additional Info :
+-LPIC exams test boot parameter editing, single-user mode entry, and chroot usage.
+-Knowledge of password recovery steps is practical sysadmin skill.
+-Security measures: protect BIOS/UEFI with passwords, disable GRUB editing.
+
+Concept : Managing systemd in Boot Process
+Description : Systemd uses socket-based activation to start services in parallel, reducing boot time and improving 
+              efficiency.Services can be enabled or disabled to control boot behavior.
+Purpose : To optimize boot performance and ensure critical services are available at startup.
+Linux commands :
+
+systemctl list-units -t service : Lists active services.
+
+systemctl is-enabled cups.service : Checks if service is enabled at boot.
+
+systemctl enable cups.service : Enables service for auto-start.
+
+cat /usr/lib/systemd/system/cups.socket : Displays socket configuration for CUPS.
+
+Used Cases: 
+-Ensuring printing or networking services start at boot, optimizing performance by disabling unused services.
+Important detailed points:
+-Socket activation allows parallel startup of dependent services.
+-Enabling services creates symlinks in *.wants directories for associated targets.
+-Disabling prevents unnecessary services from consuming resources.
+Additional Info :
+-In LPIC exams, know difference between systemctl start vs enable vs is-enabled.
+-Expect questions on socket activation and systemd service files.
+-Systemctl replaces chkconfig/service from legacy SysVinit.
