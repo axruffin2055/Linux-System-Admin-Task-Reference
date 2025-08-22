@@ -1,0 +1,189 @@
+Concept : Configuring the built-in firewall (firewalld)
+Description : Demonstrates configuring the Red Hat Enterprise Linux 7 built-in firewall called firewalld, 
+              which replaces iptables. Firewalld introduces zones for managing interfaces, services, and rules.
+Purpose : To secure the system by controlling inbound/outbound network traffic using zones and firewall rules.
+Linux commands :
+firewall-cmd --get-active-zones : Lists active zones and the interfaces/services assigned to them.
+firewall-cmd --zone=trusted --add-port=443/tcp : Adds a rule in the "trusted" zone to allow TCP port 443 traffic.
+firewall-cmd --zone=trusted --list-ports : Displays the list of open ports in the trusted zone.
+firewall-config : Opens graphical firewall configuration interface for zone and service management.
+Used Cases:
+Allowing HTTPS (443/tcp) on trusted network interfaces.
+Managing zones to separate internal vs external traffic.
+Quickly viewing which zones are active and what services are open.
+Important detailed points:
+Firewalld is enabled by default in RHEL 7.
+Zones define trust levels (trusted, public, home, internal, etc.).
+Rules can be set per-zone for granular control.
+Both CLI (firewall-cmd) and GUI (firewall-config) can be used.
+Additional Info : 
+-Firewalld provides dynamic rule changes without restarting the service. 
+-Unlike iptables, changes can be made persistent by specifying --permanent 
+ or by switching Runtime config to Permanent in the GUI.
+
+Concept : iptables rules and configuration
+Description : Explains how iptables works for IPv4 (iptables) and IPv6 (ip6tables), using chains and rules with targets.
+Purpose : To filter, block, or allow traffic by defining packet processing rules.
+Linux commands :
+iptables -F : Flushes (clears) all firewall rules.
+iptables -L -v : Lists rules in chains with verbose output.
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT : Appends rule to allow incoming SSH traffic (TCP port 22).
+Used Cases:
+Allowing SSH traffic on specific servers.
+Blocking unwanted inbound traffic by dropping or rejecting packets.
+Creating forwarding rules for routing traffic.
+Important detailed points:
+Predefined chains: INPUT, OUTPUT, FORWARD.
+PREROUTING and POSTROUTING used in NAT/mangle tables.
+DROP vs REJECT: DROP silently discards, REJECT notifies sender.
+Additional Info : 
+-iptables rules are checked sequentially; first matching rule is applied. 
+-If no match is found, the chain’s default policy is applied.
+
+Concept : Adding and deleting iptables rules
+Description : Demonstrates creating, testing, and removing firewall rules using iptables.
+Purpose : To secure or open services dynamically by adding/removing rules.
+Linux commands :
+iptables -L : Lists current rules in INPUT, FORWARD, OUTPUT chains.
+iptables -P INPUT DROP : Changes default INPUT policy to DROP all incoming traffic.
+iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT : Allows incoming HTTP (port 80) traffic.
+iptables -R INPUT 1 : Removes rule #1 in the INPUT chain.
+Used Cases:
+Blocking all traffic by default, then selectively allowing services.
+Testing connectivity by ping and web access.
+Removing temporary rules when no longer needed.
+Important detailed points:
+Policy setting (-P) applies to all traffic if no rules override.
+Rules are sequential; order affects decision-making.
+Removing rules requires specifying chain and rule number.
+Additional Info : 
+-Always check connectivity from another system to confirm rule effectiveness. 
+-Use iptables -L after every change for verification.
+
+Concept : Saving and restoring iptables rules
+Description : Shows how to make iptables rules persistent across reboots by saving them.
+Purpose : To ensure firewall rules are retained after restart.
+Linux commands :
+service iptables save : Saves rules into /etc/sysconfig/iptables.
+cat /etc/sysconfig/iptables : Displays saved rules file.
+systemctl enable iptables : Enables iptables service to start at boot and apply saved rules.
+Used Cases:
+Preserving firewall rules for web or SSH access across reboots.
+Configuring security policies that survive shutdowns.
+Important detailed points:
+By default iptables rules are stored in memory and lost at reboot.
+Saved configuration is read from /etc/sysconfig/iptables.
+Additional Info : 
+-Always test rules before saving them. 
+-If incorrect rules are saved, system may become inaccessible remotely.
+
+Concept : Configuring firewalld ruleset to load at boot
+Description : Demonstrates saving runtime firewalld rules to permanent configuration.
+Purpose : To ensure firewalld rules remain effective after reboot.
+Linux commands :
+firewall-config : Opens GUI for firewall zones and services.
+Options -> Runtime to Permanent : Converts temporary runtime rules into permanent rules.
+Used Cases:
+Enabling persistent services such as HTTP, HTTPS, DNS, DHCP.
+Ensuring firewall is not reset to defaults after reboot.
+Important detailed points:
+Runtime = temporary configuration.
+Permanent = loaded at boot.
+Always switch runtime config to permanent for production systems.
+Additional Info : 
+-You can also add rules directly with firewall-cmd --permanent. 
+-To apply, reload with firewall-cmd --reload.
+
+Concept : Opening a port through firewalld
+Description : Demonstrates opening a port (3128/tcp) for squid proxy in firewalld.
+Purpose : To allow specific application traffic (proxy, web, custom apps).
+Linux commands :
+firewall-cmd --zone=public --add-port=3128/tcp --permanent : Adds permanent firewall rule for squid proxy.
+firewall-config : GUI tool to view/manage ports and services.
+Used Cases:
+Opening ports for custom applications or services not pre-defined in firewalld.
+Permanent firewall configurations for production services.
+Important detailed points:
+Permanent changes survive reboots, runtime does not.
+Must reload or switch GUI config to Permanent to see applied changes.
+Additional Info : 
+-Always specify zone (public, trusted, internal) when opening ports. 
+-Default zone may vary by system setup.
+
+Concept : Using a firewall manager with firewalld
+Description : Explains managing firewall rules and zones via command line and graphical tool in RHEL7.
+Purpose : To configure firewalld zones, assign interfaces, and define services/ports.
+Linux commands :
+firewall-cmd --state : Shows if firewall is running.
+firewall-cmd --get-zones : Lists all available zones.
+firewall-cmd --get-services : Lists all predefined services.
+cp smtp.xml customapp.xml : Creates custom service definition.
+service firewalld restart : Restarts firewalld to load new custom service.
+Used Cases:
+Assigning internal/external interfaces to specific zones.
+Creating custom services (custom TCP ports).
+Managing runtime vs permanent firewall configs.
+Important detailed points:
+Services defined by XML files in /usr/lib/firewalld/services.
+Zones provide layered trust models.
+Interfaces tied to zones dictate allowed traffic.
+Additional Info : 
+-Custom services require restarting firewalld to appear. 
+-Always copy and edit an existing service XML to avoid syntax errors.
+
+Concept : Adding limits to network traffic (tc command)
+Description : Demonstrates limiting traffic by introducing delays with tc (traffic control).
+Purpose : To regulate or emulate network conditions such as latency, bandwidth, or packet loss.
+Linux commands :
+tc -s qdisc ls dev eth0 : Lists existing traffic control rules for device eth0.
+ping www.google.com: Tests latency to a host.
+tc qdisc add dev eth0 root netem delay 200ms : Adds 200ms latency to traffic on eth0.
+tc qdisc del dev eth0 root : Removes the delay rule.
+Used Cases:
+Simulating slow/unstable network conditions for testing.
+Bandwidth shaping and rate limiting.
+Adding latency for controlled testing of applications.
+Important detailed points:
+tc uses queuing disciplines (qdisc) to manage traffic.
+netem module supports delay, loss, duplication, reordering.
+Additional Info : 
+-Useful for developers testing applications under adverse network conditions. 
+-Rules apply per network device and can be removed when no longer needed.
+
+Concept : Security exercise - NTP, SSH, firewalld, iptables, logging
+Description : Walkthrough exercise configuring NTP, SSH, firewalld, iptables, and rsyslog logging server.
+Purpose : To integrate multiple security and network services on Linux.
+Linux commands :
+vi /etc/ntp.conf : Edit NTP configuration file with time servers.
+service ntpd start/stop : Control NTP daemon.
+ntpq -p : Displays time peers and active synchronization source.
+ntpdate pool.ntp.org : One-time sync with external NTP servers.
+firewall-cmd --zone=public --list-all : Lists firewalld rules for the public zone.
+service firewalld start : Starts firewalld if not running.
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT : Allows inbound SSH traffic.
+vi /etc/rsyslog.conf : Configure rsyslog to accept remote logs.
+ls /var/log : Verify logs and directories from remote systems.
+Used Cases:
+Enabling secure time synchronization.
+Disabling root SSH logins for security.
+Allowing SSH through both firewalld and iptables.
+Centralizing logs for multiple systems.
+Important detailed points:
+ntpdate conflicts with ntpd, stop ntpd before running it.
+Firewalld and iptables can both manage firewall rules.
+Rsyslog requires module load for UDP 514 logging.
+Additional Info : 
+-Centralized logging helps in audits, intrusion detection, and troubleshooting. 
+-NTP ensures consistent timestamps across systems.
+
+
+
+
+
+
+
+
+
+
+
+
