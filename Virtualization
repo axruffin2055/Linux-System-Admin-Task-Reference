@@ -1,4 +1,4 @@
-Concept : Identifying Red Hat Virtualization Tools
+Concept : Identifying Red Hat Virtualization Tools.
 Description: Available Red Hat Virtualization tools on a RHEL host, includes the command-line and graphical utilities.
 Purpose: Ensure proper virtualization software is installed and discover available management commands.
 Linux commands:
